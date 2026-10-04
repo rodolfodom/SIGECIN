@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{auth.login.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div class="auth-card mx-auto">
+        <div th:replace="~{layout/base :: flash}"></div>
+        <div th:if="${param.expired}" class="alert alert-warning" th:text="#{auth.login.expired}">Tu sesión expiró</div>
+        <div th:if="${param.logout}" class="alert alert-info" th:text="#{auth.login.logged-out}">Sesión cerrada</div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4" th:text="#{auth.login.title}">Iniciar sesión</h1>
+
+                <form th:action="@{/login}" th:object="${loginForm}" method="post" class="needs-validation" novalidate>
+                    <input type="hidden" th:field="*{redirect}">
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label" th:text="#{field.email}">Correo electrónico</label>
+                        <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid"
+                               autocomplete="username" maxlength="150" autofocus required>
+                        <div class="invalid-feedback" th:errors="*{email}"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label" th:text="#{field.password}">Contraseña</label>
+                        <input type="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid"
+                               th:value="''" autocomplete="current-password" required>
+                        <div class="invalid-feedback" th:errors="*{password}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" th:text="#{auth.login.submit}">Entrar</button>
+                </form>
+            </div>
+        </div>
+        <p class="text-center mt-3 small">
+            <span th:text="#{auth.login.no-account}">¿No tienes cuenta?</span>
+            <a th:href="@{/register}" th:text="#{auth.login.register-link}">Regístrate</a>
+        </p>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

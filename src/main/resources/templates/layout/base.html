@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!--/* Fragmentos comunes de todas las páginas. Uso típico:
+  <head th:replace="~{layout/base :: head(#{clave.titulo})}"></head>
+  <nav th:replace="~{layout/base :: navbar}"></nav>
+  <div th:replace="~{layout/base :: flash}"></div>
+  <footer th:replace="~{layout/base :: footer}"></footer>
+  <th:block th:replace="~{layout/base :: scripts}"></th:block>
+*/-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${title} · #{app.name}|">SIGECIN</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/sigecin.css}">
+</head>
+
+<body>
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-semibold text-primary" th:href="@{/}" th:text="#{app.name}">SIGECIN</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" th:aria-label="#{nav.toggle}">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto">
+                <th:block sec:authorize="!hasRole('BUSINESS')">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/businesses}" th:text="#{nav.businesses}">Negocios</a></li>
+                </th:block>
+                <th:block sec:authorize="hasRole('CLIENT')">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/appointments}" th:text="#{nav.my-appointments}">Mis citas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/favorites}" th:text="#{nav.favorites}">Favoritos</a></li>
+                </th:block>
+                <th:block sec:authorize="hasRole('BUSINESS')">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/business/dashboard}" th:text="#{nav.dashboard}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/business/appointments}" th:text="#{nav.calendar}">Citas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/business/services}" th:text="#{nav.services}">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/business/schedule}" th:text="#{nav.schedule}">Horario</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/business/reports}" th:text="#{nav.reports}">Reportes</a></li>
+                </th:block>
+            </ul>
+            <div class="d-flex align-items-lg-center gap-2 flex-column flex-lg-row" sec:authorize="isAuthenticated()">
+                <a sec:authorize="hasRole('BUSINESS')" class="nav-link" th:href="@{/business/profile}"
+                   th:text="${#authentication.principal.fullName}">Mi negocio</a>
+                <span sec:authorize="hasRole('CLIENT')" class="navbar-text"
+                      th:text="${#authentication.principal.fullName}">Cliente</span>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" th:text="#{nav.logout}">Cerrar sesión</button>
+                </form>
+            </div>
+            <div class="d-flex gap-2" sec:authorize="!isAuthenticated()">
+                <a class="btn btn-outline-primary btn-sm" th:href="@{/login}" th:text="#{nav.login}">Iniciar sesión</a>
+                <a class="btn btn-primary btn-sm" th:href="@{/register}" th:text="#{nav.register}">Registrarse</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--/* Mensajes flash: los controladores envían claves de messages.properties */-->
+<div th:fragment="flash">
+    <div th:if="${successKey}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="#{${successKey}}">Operación exitosa</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" th:aria-label="#{action.close}"></button>
+    </div>
+    <div th:if="${errorKey}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="#{${errorKey}}">Ocurrió un error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" th:aria-label="#{action.close}"></button>
+    </div>
+</div>
+
+<footer th:fragment="footer" class="border-top bg-white py-3 mt-auto">
+    <div class="container small text-body-secondary" th:text="|#{app.name} · #{app.description}|">SIGECIN</div>
+</footer>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <!--/* Textos de validación para forms.js: los mismos que usa el servidor */-->
+    <script th:inline="javascript">
+        window.SIGECIN_MESSAGES = {
+            required: /*[[#{NotBlank}]]*/ '',
+            email: /*[[#{Email}]]*/ '',
+            size: /*[[#{Size}]]*/ '',
+            mismatch: /*[[#{auth.register.password-mismatch}]]*/ '',
+            invalid: /*[[#{typeMismatch}]]*/ ''
+        };
+    </script>
+    <script th:src="@{/js/forms.js}"></script>
+</th:block>
+
+</body>
+</html>

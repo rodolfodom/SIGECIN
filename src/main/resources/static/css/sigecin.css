@@ -1,0 +1,20 @@
+/* Ajustes propios sobre Bootstrap */
+
+body {
+    background-color: var(--bs-tertiary-bg);
+}
+
+/* Tarjeta centrada de login y registro */
+.auth-card {
+    max-width: 440px;
+}
+
+/* Botones grandes para elegir el rol en el registro */
+.role-option {
+    padding-block: .75rem;
+    line-height: 1.3;
+}
+
+.role-option small {
+    opacity: .8;
+}

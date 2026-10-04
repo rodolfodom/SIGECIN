@@ -19,7 +19,6 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bootstrap.version>5.3.8</bootstrap.version>
         <chartjs.version>4.5.1</chartjs.version>
     </properties>
 
@@ -63,15 +62,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Frontend servido como WebJars -->
+        <!-- Chart.js servido como WebJar (Bootstrap va como archivos locales en static/vendor) -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-lite</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>bootstrap</artifactId>
-            <version>${bootstrap.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{error.404.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1 text-center">
+    <p class="display-1 fw-bold text-primary-emphasis opacity-50">404</p>
+    <h1 class="h3" th:text="#{error.404.title}">Error</h1>
+    <p class="text-body-secondary" th:text="#{error.404.message}">Ocurrió un error.</p>
+    <a class="btn btn-primary mt-2" th:href="@{/}" th:text="#{error.back-home}">Volver al inicio</a>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

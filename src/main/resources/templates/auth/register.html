@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{auth.register.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div class="auth-card mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4" th:text="#{auth.register.title}">Crear cuenta</h1>
+
+                <form th:action="@{/register}" th:object="${registerForm}" method="post" class="needs-validation" novalidate>
+                    <fieldset class="mb-3">
+                        <legend class="form-label fs-6" th:text="#{auth.register.role}">¿Cómo usarás SIGECIN?</legend>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" th:field="*{role}" value="CLIENT" id="role-client">
+                                <label class="btn btn-outline-primary w-100 role-option" for="role-client">
+                                    <span class="d-block fw-semibold" th:text="#{role.CLIENT}">Cliente</span>
+                                    <small th:text="#{auth.register.role.CLIENT.hint}">Reservo citas</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" th:field="*{role}" value="BUSINESS" id="role-business">
+                                <label class="btn btn-outline-primary w-100 role-option" for="role-business">
+                                    <span class="d-block fw-semibold" th:text="#{role.BUSINESS}">Negocio</span>
+                                    <small th:text="#{auth.register.role.BUSINESS.hint}">Recibo citas</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+                    </fieldset>
+
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label" th:text="#{field.fullName}">Nombre completo</label>
+                        <input type="text" class="form-control" th:field="*{fullName}" th:errorclass="is-invalid"
+                               autocomplete="name" maxlength="120" required>
+                        <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label" th:text="#{field.email}">Correo electrónico</label>
+                        <input type="email" class="form-control" th:field="*{email}" th:errorclass="is-invalid"
+                               autocomplete="email" maxlength="150" required>
+                        <div class="invalid-feedback" th:errors="*{email}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label" th:text="#{field.password}">Contraseña</label>
+                        <input type="password" class="form-control" th:field="*{password}" th:errorclass="is-invalid"
+                               th:value="''" autocomplete="new-password" minlength="8" maxlength="72" required
+                               th:data-size-message="#{Size.registerForm.password}" aria-describedby="password-help">
+                        <div id="password-help" class="form-text" th:text="#{auth.register.password-help}">Mínimo 8 caracteres</div>
+                        <div class="invalid-feedback" th:errors="*{password}"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label" th:text="#{field.confirmPassword}">Confirmar contraseña</label>
+                        <input type="password" class="form-control" th:field="*{confirmPassword}" th:errorclass="is-invalid"
+                               th:value="''" autocomplete="new-password" data-match="password" required>
+                        <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" th:text="#{auth.register.submit}">Crear cuenta</button>
+                </form>
+            </div>
+        </div>
+        <p class="text-center mt-3 small">
+            <span th:text="#{auth.register.has-account}">¿Ya tienes cuenta?</span>
+            <a th:href="@{/login}" th:text="#{auth.register.login-link}">Inicia sesión</a>
+        </p>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
