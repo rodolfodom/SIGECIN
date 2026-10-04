@@ -39,3 +39,21 @@ body {
     content: "✓";
     color: var(--bs-success);
 }
+
+/* Tarjetas de la búsqueda de negocios */
+.business-card {
+    transition: box-shadow .15s ease-in-out, transform .15s ease-in-out;
+}
+
+.business-card:hover,
+.business-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--bs-box-shadow) !important;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

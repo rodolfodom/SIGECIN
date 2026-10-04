@@ -2,10 +2,8 @@ package com.sigecin.business.web.form;
 
 import com.sigecin.business.dto.DaySchedule;
 import com.sigecin.business.entity.Business;
-import com.sigecin.business.entity.BusinessSchedule;
 import org.springframework.validation.Errors;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +19,10 @@ public class ScheduleForm {
 
     public static ScheduleForm from(Business business) {
         ScheduleForm form = new ScheduleForm();
-        for (DayOfWeek day : DayOfWeek.values()) {
-            BusinessSchedule saved = business.getSchedules().stream()
-                    .filter(s -> s.getDayOfWeek() == day)
-                    .findFirst()
-                    .orElse(null);
-            form.days.add(saved == null
-                    ? new DayForm(day, false, DEFAULT_OPEN, DEFAULT_CLOSE)
-                    : new DayForm(day, saved.isActive(), saved.getOpenTime(), saved.getCloseTime()));
+        for (DaySchedule day : DaySchedule.weekOf(business)) {
+            form.days.add(day.openTime() == null
+                    ? new DayForm(day.day(), false, DEFAULT_OPEN, DEFAULT_CLOSE)
+                    : new DayForm(day.day(), day.open(), day.openTime(), day.closeTime()));
         }
         return form;
     }

@@ -1,11 +1,11 @@
 package com.sigecin.business.web;
 
 import com.sigecin.auth.security.AuthenticatedUser;
+import com.sigecin.business.dto.DaySchedule;
 import com.sigecin.business.entity.Business;
 import com.sigecin.business.exception.BusinessAlreadyExistsException;
 import com.sigecin.business.service.BusinessService;
 import com.sigecin.business.web.form.BusinessForm;
-import com.sigecin.business.web.form.ScheduleForm;
 import jakarta.validation.Valid;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -66,7 +66,7 @@ public class BusinessProfileController {
         Business business = businessService.getByOwner(user.id());
         model.addAttribute("business", business);
         model.addAttribute("visibility", businessService.visibility(business));
-        model.addAttribute("week", ScheduleForm.from(business).getDays());
+        model.addAttribute("week", DaySchedule.weekOf(business));
         return "business/profile";
     }
 

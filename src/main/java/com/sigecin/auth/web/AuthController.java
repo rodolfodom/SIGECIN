@@ -7,6 +7,7 @@ import com.sigecin.auth.service.JwtService;
 import com.sigecin.auth.service.RefreshTokenService;
 import com.sigecin.auth.web.form.LoginForm;
 import com.sigecin.auth.web.form.RegisterForm;
+import com.sigecin.common.web.LocalRedirects;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
 import jakarta.servlet.http.HttpServletResponse;
@@ -100,11 +101,6 @@ public class AuthController {
 
     /** Vuelve a la página original solo si es una ruta local (evita redirecciones abiertas). */
     static String targetAfterLogin(String redirect, Role role) {
-        boolean local = redirect != null && redirect.startsWith("/")
-                && !redirect.startsWith("//") && !redirect.contains("\\");
-        if (local) {
-            return redirect;
-        }
-        return role == Role.BUSINESS ? "/business/dashboard" : "/businesses";
+        return LocalRedirects.orDefault(redirect, role == Role.BUSINESS ? "/business/dashboard" : "/businesses");
     }
 }

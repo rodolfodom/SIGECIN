@@ -65,10 +65,10 @@
                     <table class="table table-sm mb-0">
                         <tbody>
                         <tr th:each="day : ${week}">
-                            <th scope="row" class="fw-normal" th:text="#{|day.${day.day}|}">Lunes</th>
-                            <td class="text-end" th:if="${day.open}"
-                                th:text="|${#temporals.format(day.openTime, 'HH:mm')} – ${#temporals.format(day.closeTime, 'HH:mm')}|">09:00 – 18:00</td>
-                            <td class="text-end text-body-secondary" th:unless="${day.open}" th:text="#{business.schedule.closed}">Cerrado</td>
+                            <th scope="row" class="fw-normal" th:text="#{|day.${day.day()}|}">Lunes</th>
+                            <td class="text-end" th:if="${day.open()}"
+                                th:text="|${#temporals.format(day.openTime(), 'HH:mm')} – ${#temporals.format(day.closeTime(), 'HH:mm')}|">09:00 – 18:00</td>
+                            <td class="text-end text-body-secondary" th:unless="${day.open()}" th:text="#{business.schedule.closed}">Cerrado</td>
                         </tr>
                         </tbody>
                     </table>

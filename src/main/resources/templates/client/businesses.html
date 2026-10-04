@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{directory.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+    <h1 class="h3 mb-3" th:text="#{directory.title}">Encuentra un negocio</h1>
+
+    <!--/* Búsqueda: GET para que el resultado se pueda compartir y recargar */-->
+    <form th:action="@{/businesses}" method="get" class="card card-body shadow-sm mb-4" role="search">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="name" class="form-label small mb-1" th:text="#{directory.search.name}">Nombre</label>
+                <input type="search" class="form-control" id="name" name="name" th:value="${name}"
+                       maxlength="150" th:placeholder="#{directory.search.name.placeholder}">
+            </div>
+            <div class="col-md-4">
+                <label for="categoryId" class="form-label small mb-1" th:text="#{field.business.category}">Categoría</label>
+                <select class="form-select" id="categoryId" name="categoryId">
+                    <option value="" th:text="#{directory.search.all-categories}">Todas</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                            th:selected="${category.id == categoryId}">Barbería</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary" th:text="#{directory.search.submit}">Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <p class="text-body-secondary small" th:if="${results.totalElements > 0}"
+       th:text="#{directory.results.count(${results.totalElements})}">3 negocios</p>
+
+    <div th:if="${results.totalElements == 0}" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <p class="mb-2" th:text="#{directory.results.empty}">No encontramos negocios.</p>
+            <a th:if="${!#strings.isEmpty(name) or categoryId != null}" th:href="@{/businesses}"
+               th:text="#{directory.search.clear}">Ver todos</a>
+        </div>
+    </div>
+
+    <div class="row g-3" th:unless="${results.totalElements == 0}">
+        <div class="col-sm-6 col-lg-4" th:each="business : ${results.content}">
+            <a class="card h-100 shadow-sm text-decoration-none text-body business-card"
+               th:href="@{/businesses/{id}(id=${business.id})}">
+                <div class="card-body">
+                    <span class="badge rounded-pill text-bg-light border mb-2" th:text="${business.category.name}">Barbería</span>
+                    <h2 class="h5 card-title" th:text="${business.name}">Barbería El Estilo</h2>
+                    <p class="card-text small text-body-secondary line-clamp-2" th:if="${business.description}"
+                       th:text="${business.description}">Descripción</p>
+                    <p class="card-text small mb-0" th:if="${business.address}" th:text="${business.address}">Dirección</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!--/* Paginación: conserva los filtros de la búsqueda */-->
+    <nav th:if="${results.totalPages > 1}" class="mt-4" th:aria-label="#{pagination.label}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${results.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/businesses(name=${name}, categoryId=${categoryId}, page=${results.number - 1})}"
+                   th:text="#{pagination.previous}">Anterior</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, results.totalPages - 1)}"
+                th:classappend="${i == results.number} ? 'active'">
+                <a class="page-link" th:href="@{/businesses(name=${name}, categoryId=${categoryId}, page=${i})}"
+                   th:text="${i + 1}" th:attr="aria-current=${i == results.number} ? 'page'">1</a>
+            </li>
+            <li class="page-item" th:classappend="${results.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/businesses(name=${name}, categoryId=${categoryId}, page=${results.number + 1})}"
+                   th:text="#{pagination.next}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

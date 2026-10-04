@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head(${detail.business().name})}"></head>
+<body class="d-flex flex-column min-vh-100" th:with="business = ${detail.business()}">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+    <a class="small" th:href="@{/businesses}" th:text="#{directory.back}">← Volver a la búsqueda</a>
+
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mt-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1" th:text="${business.name}">Barbería El Estilo</h1>
+            <span class="badge rounded-pill text-bg-light border" th:text="${business.category.name}">Barbería</span>
+        </div>
+
+        <!--/* Favorito: solo para clientes; sin sesión se invita a iniciarla */-->
+        <th:block sec:authorize="hasRole('CLIENT')">
+            <form th:unless="${favorite}" th:action="@{/favorites/{id}(id=${business.id})}" method="post">
+                <input type="hidden" name="redirect" th:value="@{/businesses/{id}(id=${business.id})}">
+                <button type="submit" class="btn btn-outline-primary" th:text="#{favorite.add}">☆ Agregar a favoritos</button>
+            </form>
+            <form th:if="${favorite}" th:action="@{/favorites/{id}/remove(id=${business.id})}" method="post">
+                <input type="hidden" name="redirect" th:value="@{/businesses/{id}(id=${business.id})}">
+                <button type="submit" class="btn btn-primary" th:text="#{favorite.remove}">★ En favoritos</button>
+            </form>
+        </th:block>
+        <a sec:authorize="!isAuthenticated()" class="btn btn-outline-primary"
+           th:href="@{/login(redirect=|/businesses/${business.id}|)}" th:text="#{favorite.login}">☆ Inicia sesión para guardar</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <p th:if="${business.description}" th:text="${business.description}">Descripción</p>
+
+            <h2 class="h5 mt-4 mb-3" th:text="#{directory.detail.services}">Servicios</h2>
+            <div class="list-group shadow-sm">
+                <div class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 py-3"
+                     th:each="service : ${detail.services()}">
+                    <div>
+                        <div class="fw-semibold" th:text="${service.name}">Corte clásico</div>
+                        <div class="small text-body-secondary" th:if="${service.description}" th:text="${service.description}">Descripción</div>
+                        <div class="small">
+                            <span th:text="#{service.duration.value(${service.durationMin})}">30 min</span> ·
+                            <span class="fw-semibold" th:text="${'$' + #numbers.formatDecimal(service.price, 1, 'COMMA', 2, 'POINT')}">$120.00</span>
+                        </div>
+                    </div>
+                    <!--/* La disponibilidad es pública; la sesión se pide al confirmar la reserva */-->
+                    <a sec:authorize="!hasRole('BUSINESS')" class="btn btn-primary"
+                       th:href="@{/businesses/{id}/availability(id=${business.id}, serviceId=${service.id})}"
+                       th:text="#{directory.detail.book}">Reservar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h6" th:text="#{directory.detail.contact}">Contacto</h2>
+                    <p class="small mb-1" th:if="${business.address}" th:text="${business.address}">Dirección</p>
+                    <p class="small mb-0" th:if="${business.phone}">
+                        <a th:href="|tel:${business.phone}|" th:text="${business.phone}">555-1001</a>
+                    </p>
+                    <p class="small text-body-secondary mb-0" th:if="${business.address == null and business.phone == null}"
+                       th:text="#{value.none}">—</p>
+                </div>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6" th:text="#{business.profile.schedule}">Horario</h2>
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                        <tr th:each="day : ${detail.week()}">
+                            <th scope="row" class="fw-normal" th:text="#{|day.${day.day()}|}">Lunes</th>
+                            <td class="text-end" th:if="${day.open()}"
+                                th:text="|${#temporals.format(day.openTime(), 'HH:mm')} – ${#temporals.format(day.closeTime(), 'HH:mm')}|">09:00 – 18:00</td>
+                            <td class="text-end text-body-secondary" th:unless="${day.open()}" th:text="#{business.schedule.closed}">Cerrado</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
