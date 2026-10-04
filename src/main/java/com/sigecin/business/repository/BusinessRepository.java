@@ -1,6 +1,6 @@
 package com.sigecin.business.repository;
 
-import com.sigecin.business.Business;
+import com.sigecin.business.entity.Business;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
     String VISIBLE = """
             b.active = true
             and exists (select 1 from ServiceOffering s
-                         where s.business = b and s.status = com.sigecin.serviceoffering.ServiceStatus.ACTIVE)
+                         where s.business = b and s.status = com.sigecin.serviceoffering.enums.ServiceStatus.ACTIVE)
             and exists (select 1 from BusinessSchedule h
                          where h.business = b and h.active = true)
             """;

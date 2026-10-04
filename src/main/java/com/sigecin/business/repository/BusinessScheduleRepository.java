@@ -1,6 +1,6 @@
 package com.sigecin.business.repository;
 
-import com.sigecin.business.BusinessSchedule;
+import com.sigecin.business.entity.BusinessSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.DayOfWeek;

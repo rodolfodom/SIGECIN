@@ -1,7 +1,7 @@
 package com.sigecin.serviceoffering.repository;
 
-import com.sigecin.serviceoffering.ServiceOffering;
-import com.sigecin.serviceoffering.ServiceStatus;
+import com.sigecin.serviceoffering.entity.ServiceOffering;
+import com.sigecin.serviceoffering.enums.ServiceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

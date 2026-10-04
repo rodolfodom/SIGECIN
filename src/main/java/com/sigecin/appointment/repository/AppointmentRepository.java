@@ -1,7 +1,7 @@
 package com.sigecin.appointment.repository;
 
-import com.sigecin.appointment.Appointment;
-import com.sigecin.appointment.CancellationReason;
+import com.sigecin.appointment.entity.Appointment;
+import com.sigecin.appointment.entity.CancellationReason;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +21,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("""
             select count(a) > 0 from Appointment a
              where a.service.business.id = :businessId
-               and a.status <> com.sigecin.appointment.AppointmentStatus.CANCELLED
+               and a.status <> com.sigecin.appointment.enums.AppointmentStatus.CANCELLED
                and a.startTime < :end
                and a.endTime > :start
             """)
@@ -33,7 +33,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("""
             select a from Appointment a
              where a.service.business.id = :businessId
-               and a.status <> com.sigecin.appointment.AppointmentStatus.CANCELLED
+               and a.status <> com.sigecin.appointment.enums.AppointmentStatus.CANCELLED
                and a.startTime < :to
                and a.endTime > :from
              order by a.startTime
@@ -52,7 +52,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("""
             select count(a) from Appointment a
              where a.service.business.id = :businessId
-               and a.status <> com.sigecin.appointment.AppointmentStatus.CANCELLED
+               and a.status <> com.sigecin.appointment.enums.AppointmentStatus.CANCELLED
                and a.startTime > :now
             """)
     long countFutureActiveByBusiness(@Param("businessId") Long businessId, @Param("now") LocalDateTime now);
@@ -60,10 +60,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Modifying
     @Query("""
             update Appointment a
-               set a.status = com.sigecin.appointment.AppointmentStatus.CANCELLED,
+               set a.status = com.sigecin.appointment.enums.AppointmentStatus.CANCELLED,
                    a.cancelledReason = :reason
              where a.service.id in (select s.id from ServiceOffering s where s.business.id = :businessId)
-               and a.status <> com.sigecin.appointment.AppointmentStatus.CANCELLED
+               and a.status <> com.sigecin.appointment.enums.AppointmentStatus.CANCELLED
                and a.startTime > :now
             """)
     int cancelFutureActiveByBusiness(@Param("businessId") Long businessId,
@@ -77,9 +77,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Modifying
     @Query("""
             update Appointment a
-               set a.status = com.sigecin.appointment.AppointmentStatus.CANCELLED,
+               set a.status = com.sigecin.appointment.enums.AppointmentStatus.CANCELLED,
                    a.cancelledReason = :reason
-             where a.status = com.sigecin.appointment.AppointmentStatus.PENDING
+             where a.status = com.sigecin.appointment.enums.AppointmentStatus.PENDING
                and a.startTime <= :now
             """)
     int cancelExpiredPending(@Param("now") LocalDateTime now, @Param("reason") CancellationReason reason);

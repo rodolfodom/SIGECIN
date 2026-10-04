@@ -1,11 +1,11 @@
 package com.sigecin.config;
 
-import com.sigecin.auth.AuthCookies;
-import com.sigecin.auth.CookieBearerTokenResolver;
-import com.sigecin.auth.JwtService;
-import com.sigecin.auth.LoginRedirectEntryPoint;
-import com.sigecin.auth.RefreshTokenFilter;
-import com.sigecin.auth.RefreshTokenService;
+import com.sigecin.auth.security.AuthCookies;
+import com.sigecin.auth.security.CookieBearerTokenResolver;
+import com.sigecin.auth.security.LoginRedirectEntryPoint;
+import com.sigecin.auth.security.RefreshTokenFilter;
+import com.sigecin.auth.service.JwtService;
+import com.sigecin.auth.service.RefreshTokenService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 package com.sigecin.appointment.repository;
 
-import com.sigecin.appointment.CancellationReason;
-import com.sigecin.appointment.CancelledBy;
+import com.sigecin.appointment.entity.CancellationReason;
+import com.sigecin.appointment.enums.CancelledBy;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
