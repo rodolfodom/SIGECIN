@@ -43,7 +43,7 @@ import java.util.Locale;
 @Component
 public class MonthlyReportPdf {
 
-    private static final Locale LOCALE = Locale.of("es", "MX");
+    private static final Locale LOCALE = Locale.forLanguageTag("es-MX");
     private static final Color PRIMARY = new DeviceRgb(13, 110, 253);      // --bs-primary
     private static final Color MUTED = new DeviceRgb(108, 117, 125);       // --bs-secondary-color
     private static final Color LIGHT = new DeviceRgb(248, 249, 250);       // --bs-tertiary-bg

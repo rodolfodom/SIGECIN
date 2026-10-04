@@ -42,7 +42,7 @@ class BusinessRepositoryTests {
         assertThat(owner.getRole()).isEqualTo(Role.BUSINESS);
         assertThat(barberia.getCategory().getName()).isEqualTo("Barbería");
         assertThat(barberia.getSchedules()).hasSize(6);
-        assertThat(barberia.getSchedules().getFirst().getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+        assertThat(barberia.getSchedules().get(0).getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
         assertThat(schedules.findByBusinessIdAndDayOfWeekAndActiveTrue(barberia.getId(), DayOfWeek.SATURDAY))
                 .get().extracting(s -> s.getCloseTime()).isEqualTo(LocalTime.of(15, 0));
         assertThat(schedules.findByBusinessIdAndDayOfWeekAndActiveTrue(barberia.getId(), DayOfWeek.SUNDAY)).isEmpty();
@@ -60,7 +60,7 @@ class BusinessRepositoryTests {
                 .extracting(Business::getName).containsExactly("Clínica Dental Sonrisa");
 
         // Un negocio inactivo deja de ser visible
-        Business spa = businesses.searchVisible("Spa", null, all).getContent().getFirst();
+        Business spa = businesses.searchVisible("Spa", null, all).getContent().get(0);
         spa.setActive(false);
         em.flush();
         assertThat(businesses.searchVisible(null, null, all).getTotalElements()).isEqualTo(2);

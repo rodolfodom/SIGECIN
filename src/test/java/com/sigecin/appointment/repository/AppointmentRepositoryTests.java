@@ -85,7 +85,7 @@ class AppointmentRepositoryTests {
         LocalDateTime now = LocalDateTime.now();
         Long pastId = appointments.save(new Appointment(client, corte, now.minusDays(2), null)).getId();
         Long futureId = appointments.save(new Appointment(client, corte, now.plusDays(2), null)).getId();
-        CancellationReason systemReason = reasons.findByCancelledByOrderByName(CancelledBy.SYSTEM).getFirst();
+        CancellationReason systemReason = reasons.findByCancelledByOrderByName(CancelledBy.SYSTEM).get(0);
         em.flush();
 
         assertThat(appointments.cancelExpiredPending(now, systemReason)).isGreaterThanOrEqualTo(1);

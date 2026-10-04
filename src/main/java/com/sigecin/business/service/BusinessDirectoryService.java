@@ -41,7 +41,7 @@ public class BusinessDirectoryService {
     @Transactional(readOnly = true)
     public Page<Business> search(String name, Integer categoryId, int page, int size) {
         String term = name == null || name.isBlank() ? null : escapeLike(name.trim());
-        int safeSize = Math.clamp(size, 1, MAX_PAGE_SIZE);
+        int safeSize = Math.max(1, Math.min(size, MAX_PAGE_SIZE));
         return businesses.searchVisible(term, categoryId, PageRequest.of(Math.max(page, 0), safeSize));
     }
 

@@ -3,6 +3,11 @@
 --  Script DDL + datos de prueba (MariaDB / MySQL)
 -- ============================================================
 
+-- El script está en UTF-8. Se declara explícitamente porque el cliente de
+-- MariaDB 10.x usa latin1 por defecto: sin esta línea los acentos de los datos
+-- de prueba (Barbería, Clínica…) se guardarían con doble codificación.
+SET NAMES utf8mb4;
+
 DROP DATABASE IF EXISTS sigecin;
 
 CREATE DATABASE sigecin

@@ -83,10 +83,11 @@ public record CalendarView(Mode mode, LocalDate date, LocalDate today, List<Week
 
     /** Primer y último día mostrados (para el título de la vista de semana). */
     public LocalDate firstDay() {
-        return weeks.getFirst().days().getFirst().date();
+        return weeks.get(0).days().get(0).date();
     }
 
     public LocalDate lastDay() {
-        return weeks.getLast().days().getLast().date();
+        List<Day> lastWeek = weeks.get(weeks.size() - 1).days();
+        return lastWeek.get(lastWeek.size() - 1).date();
     }
 }

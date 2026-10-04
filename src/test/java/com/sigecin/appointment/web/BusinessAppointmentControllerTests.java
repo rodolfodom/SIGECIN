@@ -54,7 +54,7 @@ class BusinessAppointmentControllerTests {
         assertThat(view.weeks()).hasSize(1);
         assertThat(view.firstDay()).isEqualTo(monday);
         assertThat(view.lastDay()).isEqualTo(monday.plusDays(6));
-        var wednesday = view.weeks().getFirst().days().get(2);
+        var wednesday = view.weeks().get(0).days().get(2);
         assertThat(wednesday.appointments()).extracting(a -> a.serviceName()).containsExactly("Corte clásico");
         assertThat(view.previous()).isEqualTo(monday.plusDays(3).minusWeeks(1));
     }
@@ -87,7 +87,7 @@ class BusinessAppointmentControllerTests {
         appointments.flush();
 
         CalendarView view = calendar(auth.cookieFor(BARBERIA_OWNER), "week", monday, "PENDING");
-        assertThat(view.weeks().getFirst().days().getFirst().appointments())
+        assertThat(view.weeks().get(0).days().get(0).appointments())
                 .extracting(a -> a.appointmentId()).containsExactly(pending.getId());
     }
 
