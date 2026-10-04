@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{report.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="form-page mx-auto">
+        <div th:replace="~{layout/base :: flash}"></div>
+        <h1 class="h3 mb-1" th:text="#{report.title}">Reporte mensual</h1>
+        <p class="text-body-secondary mb-4" th:text="#{report.intro}">Descarga un PDF con el resumen del mes.</p>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <!--/* GET: la descarga es idempotente y no modifica datos */-->
+                <form th:action="@{/business/reports/monthly}" th:object="${reportPeriodForm}" method="get">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-sm-5">
+                            <label for="month" class="form-label" th:text="#{report.month}">Mes</label>
+                            <select class="form-select" th:field="*{month}">
+                                <option th:each="m : ${months}" th:value="${m.value}"
+                                        th:text="${#strings.capitalize(#temporals.monthName(#temporals.create(2000, m.value, 1)))}">Octubre</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="year" class="form-label" th:text="#{report.year}">Año</label>
+                            <select class="form-select" th:field="*{year}">
+                                <option th:each="y : ${years}" th:value="${y}" th:text="${y}">2026</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 d-grid">
+                            <button type="submit" class="btn btn-primary" th:text="#{report.download}">Descargar PDF</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <ul class="small text-body-secondary mt-3">
+            <li th:text="#{report.contents.summary}">Resumen</li>
+            <li th:text="#{report.contents.weekly}">Semanas</li>
+            <li th:text="#{report.contents.ranking}">Ranking</li>
+            <li th:text="#{report.contents.table}">Tabla</li>
+        </ul>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

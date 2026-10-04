@@ -20,6 +20,7 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <chartjs.version>4.5.1</chartjs.version>
+        <itext.version>9.1.0</itext.version>
     </properties>
 
     <dependencies>
@@ -71,6 +72,13 @@
             <groupId>org.webjars.npm</groupId>
             <artifactId>chart.js</artifactId>
             <version>${chartjs.version}</version>
+        </dependency>
+
+        <!-- Reporte mensual en PDF (iText: layout incluye kernel e io) -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>${itext.version}</version>
         </dependency>
 
         <!-- Desarrollo -->

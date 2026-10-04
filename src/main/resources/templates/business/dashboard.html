@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{dashboard.title})}"></head>
+<body class="d-flex flex-column min-vh-100" th:with="d = ${dashboard}, s = ${dashboard.summary()}">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h1 class="h3 mb-0" th:text="#{dashboard.title}">Inicio</h1>
+            <p class="text-body-secondary mb-0 text-capitalize-first"
+               th:text="${#temporals.format(#temporals.createNow(), 'EEEE d ''de'' MMMM ''de'' yyyy')}">domingo 4 de octubre</p>
+        </div>
+        <a class="btn btn-outline-primary" th:href="@{/business/reports/monthly(year=${d.weekly().month().year}, month=${d.weekly().month().monthValue})}"
+           th:text="#{dashboard.download-report}">Descargar reporte del mes</a>
+    </div>
+
+    <!--/* Indicadores */-->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="stat-label" th:text="#{dashboard.today}">Citas de hoy</div>
+                    <div class="stat-value" th:text="${s.todayAppointments()}">3</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="stat-label" th:text="#{dashboard.income}">Ingreso estimado del mes</div>
+                    <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(s.monthEstimatedIncome(), 1, 'COMMA', 2, 'POINT')}">$1,200.00</div>
+                    <div class="stat-hint" th:text="#{dashboard.income.hint}">Citas confirmadas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="stat-label" th:text="#{dashboard.top-service}">Servicio más popular</div>
+                    <div class="stat-value stat-value-text" th:if="${d.topServices().isEmpty()}" th:text="#{value.none}">—</div>
+                    <div class="stat-value stat-value-text" th:unless="${d.topServices().isEmpty()}"
+                         th:text="${#strings.listJoin(d.topServices().![serviceName()], ', ')}">Corte clásico</div>
+                    <div class="stat-hint" th:unless="${d.topServices().isEmpty()}"
+                         th:text="#{dashboard.top-service.hint(${d.topServices()[0].bookings()})}">5 reservas este mes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100 stat-card">
+                <div class="card-body">
+                    <div class="stat-label" th:text="#{dashboard.favorites}">Clientes con tu negocio en favoritos</div>
+                    <div class="stat-value" th:text="${s.favoritesCount()}">2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!--/* Próximas citas de hoy */-->
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0" th:text="#{dashboard.upcoming}">Próximas citas de hoy</h2>
+                        <a class="small" th:href="@{/business/appointments}" th:text="#{dashboard.calendar-link}">Ver calendario</a>
+                    </div>
+                    <p th:if="${d.upcoming().isEmpty()}" class="text-body-secondary mb-0" th:text="#{dashboard.upcoming.empty}">No hay más citas hoy.</p>
+                    <div class="list-group list-group-flush" th:unless="${d.upcoming().isEmpty()}">
+                        <a class="list-group-item list-group-item-action px-0 d-flex justify-content-between align-items-center gap-2"
+                           th:each="a : ${d.upcoming()}" th:href="@{/business/appointments/{id}(id=${a.appointmentId()})}">
+                            <div>
+                                <div class="fw-semibold" th:text="|${#temporals.format(a.startTime(), 'HH:mm')} · ${a.serviceName()}|">10:00 · Corte</div>
+                                <div class="small text-body-secondary" th:text="${a.clientName()}">Cliente</div>
+                            </div>
+                            <span th:replace="~{layout/base :: appointmentStatus(${a.status()})}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--/* Gráficas: datos incrustados al renderizar (Chart.js) */-->
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5" th:text="#{dashboard.chart.weekly.title}">Reservas por semana del mes</h2>
+                    <div class="chart-box">
+                        <canvas id="weekly-chart" role="img" th:aria-label="#{dashboard.chart.weekly.aria(${d.weekly().total()})}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5" th:text="#{dashboard.chart.services.title}">Servicios más solicitados del mes</h2>
+                    <p th:if="${d.ranking().isEmpty()}" class="text-body-secondary mb-0" th:text="#{dashboard.chart.services.empty}">Aún no hay reservas este mes.</p>
+                    <div class="chart-box" th:unless="${d.ranking().isEmpty()}">
+                        <canvas id="services-chart" role="img" th:aria-label="#{dashboard.chart.services.title}"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+<script th:inline="javascript">
+    window.SIGECIN_CHARTS = /*[[${charts}]]*/ {};
+</script>
+<script th:src="@{/webjars/chart.js/dist/chart.umd.min.js}"></script>
+<script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

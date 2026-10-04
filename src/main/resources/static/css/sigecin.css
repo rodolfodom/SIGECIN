@@ -176,3 +176,34 @@ body {
     color: var(--bs-secondary-color);
     margin: 0;
 }
+
+/* Dashboard: indicadores y gráficas */
+.stat-label {
+    font-size: .8rem;
+    color: var(--bs-secondary-color);
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.stat-value-text {
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+}
+
+.stat-hint {
+    font-size: .75rem;
+    color: var(--bs-secondary-color);
+}
+
+.chart-box {
+    position: relative;
+    height: 260px;
+}
+
+.text-capitalize-first::first-letter {
+    text-transform: uppercase;
+}

@@ -40,4 +40,23 @@ public class AppointmentDetailRepository {
                 .query(AppointmentDetailRow.class)
                 .list();
     }
+
+    /** Próximas citas no canceladas de hoy (desde {@code now} hasta medianoche), las más inmediatas primero. */
+    public List<AppointmentDetailRow> findUpcomingToday(Long businessId, LocalDateTime now, int limit) {
+        return jdbc.sql("""
+                        select * from v_appointment_detail
+                         where business_id = :businessId
+                           and status <> 'CANCELLED'
+                           and start_time >= :now
+                           and start_time < :tomorrow
+                         order by start_time, appointment_id
+                         limit :limit
+                        """)
+                .param("businessId", businessId)
+                .param("now", now)
+                .param("tomorrow", now.toLocalDate().plusDays(1).atStartOfDay())
+                .param("limit", limit)
+                .query(AppointmentDetailRow.class)
+                .list();
+    }
 }
