@@ -11,7 +11,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.time.Duration;
 
-/** Escribe, lee y borra la cookie HttpOnly que transporta el JWT. */
+/** Escribe, lee y borra las cookies HttpOnly del JWT de acceso y del refresh token. */
 @Component
 public class AuthCookies {
 
@@ -21,26 +21,44 @@ public class AuthCookies {
         this.properties = properties;
     }
 
-    public void write(HttpServletResponse response, String token) {
-        response.addHeader(HttpHeaders.SET_COOKIE, build(token, properties.tokenTtl()).toString());
+    public void writeAccess(HttpServletResponse response, String token) {
+        add(response, properties.accessCookieName(), token, properties.accessTokenTtl());
     }
 
-    public void clear(HttpServletResponse response) {
-        response.addHeader(HttpHeaders.SET_COOKIE, build("", Duration.ZERO).toString());
+    public void writeRefresh(HttpServletResponse response, String token) {
+        add(response, properties.refreshCookieName(), token, properties.refreshTokenTtl());
     }
 
-    public String read(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, properties.cookieName());
+    public void clearAccess(HttpServletResponse response) {
+        add(response, properties.accessCookieName(), "", Duration.ZERO);
+    }
+
+    public void clearAll(HttpServletResponse response) {
+        clearAccess(response);
+        add(response, properties.refreshCookieName(), "", Duration.ZERO);
+    }
+
+    public String readAccess(HttpServletRequest request) {
+        return read(request, properties.accessCookieName());
+    }
+
+    public String readRefresh(HttpServletRequest request) {
+        return read(request, properties.refreshCookieName());
+    }
+
+    private static String read(HttpServletRequest request, String name) {
+        Cookie cookie = WebUtils.getCookie(request, name);
         return cookie == null || cookie.getValue().isBlank() ? null : cookie.getValue();
     }
 
-    private ResponseCookie build(String value, Duration maxAge) {
-        return ResponseCookie.from(properties.cookieName(), value)
+    private void add(HttpServletResponse response, String name, String value, Duration maxAge) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(properties.cookieSecure())
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(maxAge)
                 .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }

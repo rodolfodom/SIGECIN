@@ -4,12 +4,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
-/** Configuración de la autenticación con JWT en cookie (prefijo sigecin.auth). */
+/** Configuración de la autenticación con JWT de acceso y refresh token en cookies (prefijo sigecin.auth). */
 @ConfigurationProperties("sigecin.auth")
 public record AuthProperties(
         String jwtSecret,
-        Duration tokenTtl,
-        String cookieName,
+        Duration accessTokenTtl,
+        Duration refreshTokenTtl,
+        Duration refreshReuseGrace,
+        String accessCookieName,
+        String refreshCookieName,
         boolean cookieSecure) {
 
     public AuthProperties {

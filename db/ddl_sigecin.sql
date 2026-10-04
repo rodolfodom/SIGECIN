@@ -45,6 +45,30 @@ CREATE TABLE user (
 ) ENGINE=InnoDB;
 
 
+-- Refresh tokens de las sesiones (el access token JWT dura poco y no se guarda).
+-- Solo se almacena el hash SHA-256 del token; el valor en claro vive únicamente en
+-- la cookie HttpOnly del navegador. Cada uso rota el token: el anterior queda revocado
+-- y apunta a su reemplazo. Todos los tokens de un mismo inicio de sesión comparten
+-- family_id; si se presenta un token ya rotado (posible robo), se revoca la familia.
+CREATE TABLE refresh_token (
+    id              BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    user_id         BIGINT UNSIGNED  NOT NULL,
+    family_id       CHAR(36)         NOT NULL,   -- UUID del inicio de sesión
+    token_hash      CHAR(64)         NOT NULL,   -- SHA-256 en hexadecimal
+    expires_at      DATETIME         NOT NULL,
+    revoked_at      DATETIME             NULL,   -- NULL mientras el token sea usable
+    replaced_by_id  BIGINT UNSIGNED      NULL,   -- token que lo reemplazó al rotar (NULL si se revocó por logout o robo)
+    created_at      DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_refresh_token             PRIMARY KEY (id),
+    CONSTRAINT uq_refresh_token_hash        UNIQUE (token_hash),
+    CONSTRAINT fk_refresh_token_user        FOREIGN KEY (user_id)        REFERENCES user (id) ON DELETE CASCADE,
+    CONSTRAINT fk_refresh_token_replaced_by FOREIGN KEY (replaced_by_id) REFERENCES refresh_token (id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_refresh_token_family  ON refresh_token (family_id);
+CREATE INDEX idx_refresh_token_expires ON refresh_token (expires_at);
+
+
 -- ============================================================
 --  MÓDULO: Gestión de Negocios
 -- ============================================================

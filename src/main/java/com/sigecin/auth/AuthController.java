@@ -23,11 +23,14 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokens;
     private final AuthCookies cookies;
 
-    public AuthController(AuthService authService, JwtService jwtService, AuthCookies cookies) {
+    public AuthController(AuthService authService, JwtService jwtService,
+                          RefreshTokenService refreshTokens, AuthCookies cookies) {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.refreshTokens = refreshTokens;
         this.cookies = cookies;
     }
 
@@ -85,7 +88,8 @@ public class AuthController {
             model.addAttribute("errorKey", "auth.login.disabled");
             return "auth/login";
         }
-        cookies.write(response, jwtService.issueToken(user));
+        cookies.writeAccess(response, jwtService.issueToken(user));
+        cookies.writeRefresh(response, refreshTokens.create(user));
         return "redirect:" + targetAfterLogin(loginForm.getRedirect(), user.getRole());
     }
 

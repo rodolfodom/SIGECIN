@@ -39,7 +39,7 @@ public class JwtService {
                 .issuer(ISSUER)
                 .subject(user.getId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plus(properties.tokenTtl()))
+                .expiresAt(now.plus(properties.accessTokenTtl()))
                 .claim(CLAIM_ROLE, user.getRole().name())
                 .claim(CLAIM_NAME, user.getFullName())
                 .claim(CLAIM_EMAIL, user.getEmail())
