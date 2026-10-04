@@ -8,4 +8,7 @@ import java.util.List;
 public interface BusinessCategoryRepository extends JpaRepository<BusinessCategory, Integer> {
 
     List<BusinessCategory> findAllByOrderByNameAsc();
+
+    /** En el orden del catálogo ("Otro" queda al final). */
+    List<BusinessCategory> findAllByOrderByIdAsc();
 }

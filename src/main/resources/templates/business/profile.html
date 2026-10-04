@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{business.profile.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1" th:text="${business.name}">Barbería El Estilo</h1>
+            <span class="badge rounded-pill text-bg-light border" th:text="${business.category.name}">Barbería</span>
+            <span th:if="${business.active}" class="badge rounded-pill text-bg-success" th:text="#{status.business.active}">Activo</span>
+            <span th:unless="${business.active}" class="badge rounded-pill text-bg-secondary" th:text="#{status.business.inactive}">Inactivo</span>
+        </div>
+        <a class="btn btn-outline-primary" th:href="@{/business/profile/edit}" th:text="#{business.profile.edit}">Editar datos</a>
+    </div>
+
+    <!--/* Qué le falta al negocio para aparecer en la búsqueda */-->
+    <div th:unless="${visibility.visible()}" class="alert alert-warning">
+        <h2 class="h6 alert-heading" th:text="#{business.visibility.hidden.title}">Tu negocio aún no es visible</h2>
+        <p class="mb-2 small" th:text="#{business.visibility.hidden.intro}">Para que los clientes lo encuentren:</p>
+        <ul class="list-unstyled mb-0 small visibility-checklist">
+            <li th:classappend="${visibility.active()} ? 'done'">
+                <span th:text="#{business.visibility.active}">El negocio está activo</span>
+            </li>
+            <li th:classappend="${visibility.hasActiveSchedule()} ? 'done'">
+                <span th:text="#{business.visibility.schedule}">Al menos un día de horario activo</span>
+                <a th:unless="${visibility.hasActiveSchedule()}" th:href="@{/business/schedule}" th:text="#{business.visibility.schedule.link}">Definir horario</a>
+            </li>
+            <li th:classappend="${visibility.hasActiveService()} ? 'done'">
+                <span th:text="#{business.visibility.service}">Al menos un servicio activo</span>
+                <a th:unless="${visibility.hasActiveService()}" th:href="@{/business/services/new}" th:text="#{business.visibility.service.link}">Agregar servicio</a>
+            </li>
+        </ul>
+    </div>
+    <div th:if="${visibility.visible()}" class="alert alert-success small" th:text="#{business.visibility.visible}">
+        Tu negocio es visible para los clientes.
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3" th:text="#{business.profile.details}">Datos del negocio</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4" th:text="#{field.business.description}">Descripción</dt>
+                        <dd class="col-sm-8" th:text="${business.description} ?: #{value.none}">—</dd>
+                        <dt class="col-sm-4" th:text="#{field.business.phone}">Teléfono</dt>
+                        <dd class="col-sm-8" th:text="${business.phone} ?: #{value.none}">—</dd>
+                        <dt class="col-sm-4" th:text="#{field.business.address}">Dirección</dt>
+                        <dd class="col-sm-8 mb-0" th:text="${business.address} ?: #{value.none}">—</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0" th:text="#{business.profile.schedule}">Horario</h2>
+                        <a class="small" th:href="@{/business/schedule}" th:text="#{action.edit}">Editar</a>
+                    </div>
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                        <tr th:each="day : ${week}">
+                            <th scope="row" class="fw-normal" th:text="#{|day.${day.day}|}">Lunes</th>
+                            <td class="text-end" th:if="${day.open}"
+                                th:text="|${#temporals.format(day.openTime, 'HH:mm')} – ${#temporals.format(day.closeTime, 'HH:mm')}|">09:00 – 18:00</td>
+                            <td class="text-end text-body-secondary" th:unless="${day.open}" th:text="#{business.schedule.closed}">Cerrado</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--/* Baja y reactivación */-->
+    <div class="card border-danger-subtle mt-4">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div th:if="${business.active}">
+                <h2 class="h6 mb-1" th:text="#{business.deactivate.title}">Dar de baja el negocio</h2>
+                <p class="small text-body-secondary mb-0" th:text="#{business.deactivate.hint}">Deja de recibir reservas.</p>
+            </div>
+            <a th:if="${business.active}" class="btn btn-outline-danger" th:href="@{/business/profile/deactivate}"
+               th:text="#{business.deactivate.action}">Dar de baja</a>
+
+            <div th:unless="${business.active}">
+                <h2 class="h6 mb-1" th:text="#{business.activate.title}">Reactivar el negocio</h2>
+                <p class="small text-body-secondary mb-0" th:text="#{business.activate.hint}">Vuelve a recibir reservas.</p>
+            </div>
+            <form th:unless="${business.active}" th:action="@{/business/profile/activate}" method="post">
+                <button type="submit" class="btn btn-success" th:text="#{business.activate.action}">Reactivar</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

@@ -11,6 +11,8 @@ public interface BusinessScheduleRepository extends JpaRepository<BusinessSchedu
 
     List<BusinessSchedule> findByBusinessIdOrderByDayOfWeek(Long businessId);
 
+    boolean existsByBusinessIdAndActiveTrue(Long businessId);
+
     /** Horario activo de un día; vacío si el negocio no abre ese día. */
     Optional<BusinessSchedule> findByBusinessIdAndDayOfWeekAndActiveTrue(Long businessId, DayOfWeek dayOfWeek);
 }

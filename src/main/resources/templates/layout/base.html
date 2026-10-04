@@ -62,7 +62,7 @@
 <!--/* Mensajes flash: los controladores envían claves de messages.properties */-->
 <div th:fragment="flash">
     <div th:if="${successKey}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="#{${successKey}}">Operación exitosa</span>
+        <span th:text="${successArg} != null ? #{${successKey}(${successArg})} : #{${successKey}}">Operación exitosa</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" th:aria-label="#{action.close}"></button>
     </div>
     <div th:if="${errorKey}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -83,6 +83,8 @@
             required: /*[[#{NotBlank}]]*/ '',
             email: /*[[#{Email}]]*/ '',
             size: /*[[#{Size}]]*/ '',
+            min: /*[[#{Min}]]*/ '',
+            max: /*[[#{Max}]]*/ '',
             mismatch: /*[[#{auth.register.password-mismatch}]]*/ '',
             invalid: /*[[#{typeMismatch}]]*/ ''
         };

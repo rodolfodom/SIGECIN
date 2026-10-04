@@ -18,3 +18,24 @@ body {
 .role-option small {
     opacity: .8;
 }
+
+/* Formularios de una columna (perfil, horario, servicios) */
+.form-page {
+    max-width: 720px;
+}
+
+/* Lista de requisitos de visibilidad del negocio */
+.visibility-checklist li::before {
+    content: "○";
+    display: inline-block;
+    width: 1.25em;
+}
+
+.visibility-checklist li.done {
+    opacity: .7;
+}
+
+.visibility-checklist li.done::before {
+    content: "✓";
+    color: var(--bs-success);
+}

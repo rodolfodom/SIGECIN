@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--/* Alta (sin serviceId) y edición (con serviceId) de un servicio */-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(${serviceId} ? #{service.edit.title} : #{service.new.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="form-page mx-auto">
+        <h1 class="h3 mb-4" th:text="${serviceId} ? #{service.edit.title} : #{service.new.title}">Nuevo servicio</h1>
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form th:action="${serviceId} ? @{/business/services/{id}(id=${serviceId})} : @{/business/services}"
+                      th:object="${serviceForm}" method="post" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label" th:text="#{field.service.name}">Nombre</label>
+                        <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid"
+                               maxlength="120" required>
+                        <div class="invalid-feedback" th:errors="*{name}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <span th:text="#{field.service.description}">Descripción</span>
+                            <span class="text-body-secondary small" th:text="#{field.optional}">(opcional)</span>
+                        </label>
+                        <input type="text" class="form-control" th:field="*{description}" th:errorclass="is-invalid"
+                               maxlength="255">
+                        <div class="invalid-feedback" th:errors="*{description}"></div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="durationMin" class="form-label" th:text="#{field.service.duration-min}">Duración (minutos)</label>
+                            <input type="number" class="form-control" th:field="*{durationMin}" th:errorclass="is-invalid"
+                                   min="5" max="480" step="1" inputmode="numeric" required>
+                            <div class="invalid-feedback" th:errors="*{durationMin}"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="price" class="form-label" th:text="#{field.service.price-mxn}">Precio (MXN)</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" th:field="*{price}" th:errorclass="is-invalid"
+                                       min="0" max="99999999.99" step="0.01" inputmode="decimal" required
+                                       th:data-step-message="#{Digits.serviceForm.price}">
+                                <div class="invalid-feedback" th:errors="*{price}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p th:if="${serviceId}" class="small text-body-secondary" th:text="#{service.edit.note}">Nota</p>
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a class="btn btn-outline-secondary" th:href="@{/business/services}" th:text="#{action.cancel}">Cancelar</a>
+                        <button type="submit" class="btn btn-primary" th:text="#{action.save}">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

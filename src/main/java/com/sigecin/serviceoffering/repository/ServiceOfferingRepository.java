@@ -14,6 +14,8 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
 
     List<ServiceOffering> findByBusinessIdAndStatusOrderByName(Long businessId, ServiceStatus status);
 
+    boolean existsByBusinessIdAndStatus(Long businessId, ServiceStatus status);
+
     /** Busca un servicio verificando que pertenezca al negocio (si no, 404). */
     Optional<ServiceOffering> findByIdAndBusinessId(Long id, Long businessId);
 }

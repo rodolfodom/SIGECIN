@@ -15,6 +15,9 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "appointment_cancellation_reason")
 public class CancellationReason {
 
+    /** Motivo que se asigna a las citas futuras cuando el dueño da de baja su negocio. */
+    public static final String BUSINESS_DEACTIVATED = "Cancelada por el dueño del negocio";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JdbcTypeCode(SqlTypes.TINYINT)
