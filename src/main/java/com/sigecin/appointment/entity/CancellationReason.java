@@ -18,6 +18,9 @@ public class CancellationReason {
     /** Motivo que se asigna a las citas futuras cuando el dueño da de baja su negocio. */
     public static final String BUSINESS_DEACTIVATED = "Cancelada por el dueño del negocio";
 
+    /** Motivo de actor SYSTEM para las citas PENDING que llegaron a su hora sin confirmarse. */
+    public static final String NOT_CONFIRMED_IN_TIME = "Cancelada automáticamente: no fue confirmada a tiempo";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JdbcTypeCode(SqlTypes.TINYINT)

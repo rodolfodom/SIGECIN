@@ -75,6 +75,16 @@ public class Appointment {
         this.clientNotes = clientNotes;
     }
 
+    /** El cliente o el negocio aún pueden cancelarla: no está cancelada y no ha empezado. */
+    public boolean isCancellable(LocalDateTime now) {
+        return status != AppointmentStatus.CANCELLED && startTime.isAfter(now);
+    }
+
+    /** El negocio aún puede confirmarla: está pendiente y no ha empezado. */
+    public boolean isConfirmable(LocalDateTime now) {
+        return status == AppointmentStatus.PENDING && startTime.isAfter(now);
+    }
+
     public Long getId() {
         return id;
     }

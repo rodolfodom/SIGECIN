@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{calendar.title})}"></head>
+<body class="d-flex flex-column min-vh-100"
+      th:with="cal = ${calendar}, month = ${calendar.mode().name() == 'MONTH'}, view = ${calendar.mode().param()}">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container-xl py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+
+    <!--/* Barra: navegación, título, vista y filtro de estado (todo con enlaces y GET) */-->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary" th:href="@{/business/appointments(view=${view}, date=${cal.previous()}, status=${status})}"
+               th:title="#{calendar.previous}" th:aria-label="#{calendar.previous}">‹</a>
+            <a class="btn btn-outline-secondary" th:href="@{/business/appointments(view=${view}, status=${status})}"
+               th:text="#{calendar.today}">Hoy</a>
+            <a class="btn btn-outline-secondary" th:href="@{/business/appointments(view=${view}, date=${cal.next()}, status=${status})}"
+               th:title="#{calendar.next}" th:aria-label="#{calendar.next}">›</a>
+        </div>
+        <h1 class="h4 mb-0 me-auto text-capitalize"
+            th:text="${month} ? ${#temporals.format(cal.date(), 'MMMM yyyy')}
+                     : |${#temporals.format(cal.firstDay(), 'd MMM')} – ${#temporals.format(cal.lastDay(), 'd MMM yyyy')}|">octubre 2026</h1>
+        <form th:action="@{/business/appointments}" method="get" class="d-flex gap-2">
+            <input type="hidden" name="view" th:value="${view}">
+            <input type="hidden" name="date" th:value="${cal.date()}">
+            <select class="form-select" name="status" th:aria-label="#{field.status}" onchange="this.form.submit()">
+                <option value="" th:text="#{calendar.filter.active}">Todas</option>
+                <option th:each="s : ${statuses}" th:value="${s}" th:selected="${s == status}"
+                        th:text="#{|status.appointment.${s}|}">Pendiente</option>
+            </select>
+            <noscript><button type="submit" class="btn btn-outline-secondary" th:text="#{appointments.filter.apply}">Filtrar</button></noscript>
+        </form>
+        <div class="btn-group" role="group" th:aria-label="#{calendar.view}">
+            <a class="btn" th:classappend="${month} ? 'btn-outline-primary' : 'btn-primary'"
+               th:href="@{/business/appointments(view='week', date=${cal.date()}, status=${status})}" th:text="#{calendar.week}">Semana</a>
+            <a class="btn" th:classappend="${month} ? 'btn-primary' : 'btn-outline-primary'"
+               th:href="@{/business/appointments(view='month', date=${cal.date()}, status=${status})}" th:text="#{calendar.month}">Mes</a>
+        </div>
+    </div>
+
+    <!--/* Encabezado de días (solo pantallas medianas en adelante) */-->
+    <div class="calendar-grid calendar-head d-none d-md-grid">
+        <div th:each="d : ${cal.weeks()[0].days()}" th:text="${#temporals.format(d.date(), 'EEE')}">lun</div>
+    </div>
+
+    <div class="calendar-grid mb-2" th:each="week : ${cal.weeks()}" th:classappend="${month} ? 'calendar-month' : 'calendar-week'">
+        <section class="calendar-day" th:each="d : ${week.days()}"
+                 th:classappend="${(d.inPeriod() ? '' : 'outside ') + (d.today() ? 'today' : '')}">
+            <header class="calendar-day-head">
+                <span class="d-md-none" th:text="${#temporals.format(d.date(), 'EEEE')}">lunes</span>
+                <span class="day-number" th:text="${month} ? ${d.date().dayOfMonth} : ${#temporals.format(d.date(), 'd MMM')}">12</span>
+            </header>
+            <a class="calendar-appt" th:each="a : ${d.appointments()}" th:classappend="|status-${a.status()}|"
+               th:href="@{/business/appointments/{id}(id=${a.appointmentId()})}">
+                <span class="fw-semibold" th:text="${#temporals.format(a.startTime(), 'HH:mm')}">10:00</span>
+                <span th:text="${a.serviceName()}">Corte</span>
+                <span class="d-block small text-truncate" th:unless="${month}" th:text="${a.clientName()}">Cliente</span>
+            </a>
+            <a class="calendar-more" th:if="${d.hidden() > 0}"
+               th:href="@{/business/appointments(view='week', date=${d.date()}, status=${status})}"
+               th:text="#{calendar.more(${d.hidden()})}">+2 más</a>
+            <p class="calendar-empty" th:if="${!month and d.appointments().isEmpty()}" th:text="#{calendar.empty-day}">Sin citas</p>
+        </section>
+    </div>
+
+    <p class="small text-body-secondary mt-3">
+        <span class="badge rounded-pill status-PENDING" th:text="#{status.appointment.PENDING}">Pendiente</span>
+        <span class="badge rounded-pill status-CONFIRMED" th:text="#{status.appointment.CONFIRMED}">Confirmada</span>
+        <span class="badge rounded-pill status-CANCELLED" th:text="#{status.appointment.CANCELLED}">Cancelada</span>
+        <span class="ms-2" th:text="#{calendar.legend}">Haz clic en una cita para ver su detalle.</span>
+    </p>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

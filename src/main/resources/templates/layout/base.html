@@ -71,6 +71,10 @@
     </div>
 </div>
 
+<!--/* Etiqueta del estado de una cita (PENDING, CONFIRMED, CANCELLED) */-->
+<span th:fragment="appointmentStatus(status)" class="badge rounded-pill"
+      th:classappend="|status-${status}|" th:text="#{|status.appointment.${status}|}">Pendiente</span>
+
 <footer th:fragment="footer" class="border-top bg-white py-3 mt-auto">
     <div class="container small text-body-secondary" th:text="|#{app.name} · #{app.description}|">SIGECIN</div>
 </footer>

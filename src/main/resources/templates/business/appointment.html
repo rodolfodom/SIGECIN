@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{appointment.title})}"></head>
+<body class="d-flex flex-column min-vh-100" th:with="a = ${appointment}, business = ${appointment.service.business}">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="form-page mx-auto">
+        <div th:replace="~{layout/base :: flash}"></div>
+        <a class="small" th:href="@{/business/appointments(date=${a.startTime.toLocalDate()})}"
+           th:text="#{appointment.back-to-calendar}">← Calendario</a>
+
+        <div class="card shadow-sm mt-2">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                    <h1 class="h4 mb-0" th:text="${a.service.name}">Corte clásico</h1>
+                    <span th:replace="~{layout/base :: appointmentStatus(${a.status})}"></span>
+                </div>
+                <div th:replace="~{client/appointment :: details}"></div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-3" th:if="${a.isCancellable(now)}">
+            <div class="card-body p-4 d-flex flex-column gap-3">
+                <form th:if="${a.isConfirmable(now)}" th:action="@{/business/appointments/{id}/confirm(id=${a.id})}" method="post">
+                    <p class="small text-body-secondary mb-2" th:text="#{appointment.confirm.hint}">Confirma la cita.</p>
+                    <button type="submit" class="btn btn-success" th:text="#{appointment.confirm.submit}">Confirmar cita</button>
+                </form>
+                <form th:action="@{/business/appointments/{id}/cancel(id=${a.id})}" method="post" class="needs-validation" novalidate>
+                    <label for="reasonId" class="form-label small" th:text="#{appointment.cancel.title}">Cancelar la cita</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <select class="form-select w-auto flex-grow-1" id="reasonId" name="reasonId" required>
+                            <option value="" th:text="#{action.select}">Selecciona…</option>
+                            <option th:each="r : ${reasons}" th:value="${r.id}" th:text="${r.name}">Motivo</option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-danger" th:text="#{appointment.cancel.submit}">Cancelar cita</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

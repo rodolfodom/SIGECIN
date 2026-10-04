@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head(#{availability.title})}"></head>
+<body class="d-flex flex-column min-vh-100"
+      th:with="business = ${availability.business()}, service = ${availability.service()}, date = ${availability.date()}">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="form-page mx-auto">
+        <div th:replace="~{layout/base :: flash}"></div>
+        <a class="small" th:href="@{/businesses/{id}(id=${business.id})}" th:text="|← ${business.name}|">← Negocio</a>
+
+        <h1 class="h3 mt-2 mb-1" th:text="#{availability.heading(${service.name})}">Reservar Corte clásico</h1>
+        <p class="text-body-secondary">
+            <span th:text="${business.name}">Barbería</span> ·
+            <span th:text="#{service.duration.value(${service.durationMin})}">30 min</span> ·
+            <span th:text="${'$' + #numbers.formatDecimal(service.price, 1, 'COMMA', 2, 'POINT')}">$120.00</span>
+        </p>
+
+        <!--/* Cambio de fecha: GET para que la página se pueda recargar y compartir */-->
+        <form th:action="@{/businesses/{id}/availability(id=${business.id})}" method="get"
+              class="card card-body shadow-sm mb-3">
+            <input type="hidden" name="serviceId" th:value="${service.id}">
+            <div class="row g-2 align-items-end">
+                <div class="col-sm-6">
+                    <label for="date" class="form-label small mb-1" th:text="#{availability.date}">Fecha</label>
+                    <input type="date" class="form-control" id="date" name="date"
+                           th:value="${date}" th:min="${today}">
+                </div>
+                <div class="col-sm-6 d-flex gap-2">
+                    <a class="btn btn-outline-secondary flex-fill" th:classappend="${!date.isAfter(today)} ? 'disabled'"
+                       th:href="@{/businesses/{id}/availability(id=${business.id}, serviceId=${service.id}, date=${date.minusDays(1)})}"
+                       th:text="#{availability.previous-day}">← Día anterior</a>
+                    <a class="btn btn-outline-secondary flex-fill"
+                       th:href="@{/businesses/{id}/availability(id=${business.id}, serviceId=${service.id}, date=${date.plusDays(1)})}"
+                       th:text="#{availability.next-day}">Día siguiente →</a>
+                    <button type="submit" class="btn btn-primary flex-fill" th:text="#{availability.show}">Ver horas</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-3" th:text="${#temporals.format(date, 'EEEE d ''de'' MMMM ''de'' yyyy')}">lunes 12 de octubre</h2>
+
+                <p th:unless="${availability.day().open()}" class="text-body-secondary mb-0"
+                   th:text="#{availability.closed}">El negocio no abre este día.</p>
+                <p th:if="${availability.day().open() and availability.slots().isEmpty()}" class="text-body-secondary mb-0"
+                   th:text="#{availability.empty}">No hay horas disponibles.</p>
+
+                <th:block th:unless="${availability.slots().isEmpty()}">
+                    <!--/* Cliente con sesión: la página es el formulario de reserva */-->
+                    <form sec:authorize="hasRole('CLIENT')" th:action="@{/appointments}" th:object="${bookingForm}"
+                          method="post" class="needs-validation" novalidate>
+                        <input type="hidden" th:field="*{businessId}">
+                        <input type="hidden" th:field="*{serviceId}">
+                        <input type="hidden" th:field="*{date}">
+                        <fieldset class="mb-3">
+                            <legend class="form-label fs-6" th:text="#{availability.pick-time}">Elige una hora</legend>
+                            <div class="slot-grid">
+                                <th:block th:each="slot, it : ${availability.slots()}">
+                                    <input type="radio" class="btn-check" name="startTime" th:id="|slot-${it.index}|"
+                                           th:value="${#temporals.format(date.atTime(slot), 'yyyy-MM-dd''T''HH:mm')}" required>
+                                    <label class="btn btn-outline-primary" th:for="|slot-${it.index}|"
+                                           th:text="${#temporals.format(slot, 'HH:mm')}">10:00</label>
+                                </th:block>
+                            </div>
+                        </fieldset>
+                        <div class="mb-3">
+                            <label for="clientNotes" class="form-label">
+                                <span th:text="#{field.appointment.notes}">Notas para el negocio</span>
+                                <span class="text-body-secondary small" th:text="#{field.optional}">(opcional)</span>
+                            </label>
+                            <textarea class="form-control" th:field="*{clientNotes}" rows="2" maxlength="500"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" th:text="#{availability.submit}">Confirmar reserva</button>
+                    </form>
+
+                    <!--/* Sin sesión de cliente: se muestran las horas y se pide iniciar sesión */-->
+                    <th:block sec:authorize="!hasRole('CLIENT')">
+                        <div class="slot-grid mb-3">
+                            <span class="btn btn-outline-secondary disabled" th:each="slot : ${availability.slots()}"
+                                  th:text="${#temporals.format(slot, 'HH:mm')}">10:00</span>
+                        </div>
+                        <a sec:authorize="!isAuthenticated()" class="btn btn-primary w-100"
+                           th:href="@{/login(redirect=|/businesses/${business.id}/availability?serviceId=${service.id}&date=${date}|)}"
+                           th:text="#{availability.login}">Inicia sesión para reservar</a>
+                        <p sec:authorize="hasRole('BUSINESS')" class="small text-body-secondary mb-0"
+                           th:text="#{availability.clients-only}">Solo los clientes pueden reservar.</p>
+                    </th:block>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>

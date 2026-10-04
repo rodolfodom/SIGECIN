@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(#{appointments.title})}"></head>
+<body class="d-flex flex-column min-vh-100">
+<nav th:replace="~{layout/base :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div th:replace="~{layout/base :: flash}"></div>
+    <h1 class="h3 mb-3" th:text="#{appointments.title}">Mis citas</h1>
+
+    <form th:action="@{/appointments}" method="get" class="card card-body shadow-sm mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-sm-6 col-lg-3">
+                <label for="status" class="form-label small mb-1" th:text="#{field.status}">Estado</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="" th:text="#{appointments.filter.all}">Todos</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:selected="${s == status}"
+                            th:text="#{|status.appointment.${s}|}">Pendiente</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label for="from" class="form-label small mb-1" th:text="#{appointments.filter.from}">Desde</label>
+                <input type="date" class="form-control" id="from" name="from" th:value="${from}">
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label for="to" class="form-label small mb-1" th:text="#{appointments.filter.to}">Hasta</label>
+                <input type="date" class="form-control" id="to" name="to" th:value="${to}">
+            </div>
+            <div class="col-sm-6 col-lg-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill" th:text="#{appointments.filter.apply}">Filtrar</button>
+                <a class="btn btn-outline-secondary" th:href="@{/appointments}" th:text="#{appointments.filter.clear}">Limpiar</a>
+            </div>
+        </div>
+    </form>
+
+    <div th:if="${appointments.totalElements == 0}" class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <p class="mb-3 text-body-secondary" th:text="#{appointments.empty}">No tienes citas.</p>
+            <a class="btn btn-primary" th:href="@{/businesses}" th:text="#{favorite.list.explore}">Buscar negocios</a>
+        </div>
+    </div>
+
+    <div class="list-group shadow-sm" th:unless="${appointments.totalElements == 0}">
+        <a class="list-group-item list-group-item-action py-3" th:each="a : ${appointments.content}"
+           th:href="@{/appointments/{id}(id=${a.id})}">
+            <div class="d-flex flex-wrap justify-content-between gap-2">
+                <div>
+                    <div class="fw-semibold" th:text="|${a.service.name} · ${a.service.business.name}|">Corte · Barbería</div>
+                    <div class="small text-body-secondary"
+                         th:text="|${#temporals.format(a.startTime, 'EEE d MMM yyyy, HH:mm')} – ${#temporals.format(a.endTime, 'HH:mm')}|">lun 12 oct, 10:00</div>
+                    <div class="small text-body-secondary" th:if="${a.cancelledReason}" th:text="${a.cancelledReason.name}">Motivo</div>
+                </div>
+                <div class="text-end">
+                    <span th:replace="~{layout/base :: appointmentStatus(${a.status})}"></span>
+                    <div class="small mt-1" th:text="${'$' + #numbers.formatDecimal(a.priceAtBooking, 1, 'COMMA', 2, 'POINT')}">$120.00</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <nav th:if="${appointments.totalPages > 1}" class="mt-4" th:aria-label="#{pagination.label}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${appointments.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/appointments(status=${status}, from=${from}, to=${to}, page=${appointments.number - 1})}"
+                   th:text="#{pagination.previous}">Anterior</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link" th:text="#{appointments.page(${appointments.number + 1}, ${appointments.totalPages})}">1 de 3</span>
+            </li>
+            <li class="page-item" th:classappend="${appointments.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/appointments(status=${status}, from=${from}, to=${to}, page=${appointments.number + 1})}"
+                   th:text="#{pagination.next}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<footer th:replace="~{layout/base :: footer}"></footer>
+<th:block th:replace="~{layout/base :: scripts}"></th:block>
+</body>
+</html>
