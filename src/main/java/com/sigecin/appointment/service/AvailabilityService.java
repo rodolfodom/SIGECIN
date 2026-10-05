@@ -9,6 +9,7 @@ import com.sigecin.business.repository.BusinessRepository;
 import com.sigecin.common.exception.NotFoundException;
 import com.sigecin.serviceoffering.entity.ServiceOffering;
 import com.sigecin.serviceoffering.repository.ServiceOfferingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import java.util.List;
  * cancelada del negocio. Es solo una sugerencia: la reserva vuelve a validarlo todo.
  */
 @Service
+@RequiredArgsConstructor
 public class AvailabilityService {
 
     public static final int SLOT_STEP_MINUTES = 15;
@@ -32,13 +34,6 @@ public class AvailabilityService {
     private final BusinessRepository businesses;
     private final ServiceOfferingRepository services;
     private final AppointmentRepository appointments;
-
-    public AvailabilityService(BusinessRepository businesses, ServiceOfferingRepository services,
-                               AppointmentRepository appointments) {
-        this.businesses = businesses;
-        this.services = services;
-        this.appointments = appointments;
-    }
 
     /** Negocio no visible o servicio que no es suyo o está inactivo: 404. */
     @Transactional(readOnly = true)

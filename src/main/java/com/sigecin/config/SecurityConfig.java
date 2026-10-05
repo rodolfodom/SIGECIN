@@ -9,6 +9,8 @@ import com.sigecin.auth.service.RefreshTokenService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,6 +34,7 @@ import java.util.Arrays;
  * HttpOnly y se valida en cada petición; al vencer, {@link RefreshTokenFilter} lo
  * renueva con el refresh token (otra cookie HttpOnly, guardado como hash en la BD).
  * Como la autenticación va en cookie, CSRF permanece habilitado (también en cookie).
+ * Las rutas /api/** tienen su propia cadena, con el JWT en el encabezado Authorization.
  * <p>
  * El filtro del JWT se registra a mano en lugar de usar {@code oauth2ResourceServer()}:
  * ese DSL excluye de CSRF toda petición con token, lo cual es correcto para el
@@ -45,7 +48,36 @@ public class SecurityConfig {
             "/login", "/register", "/vendor/**", "/webjars/**", "/css/**", "/js/**", "/img/**", "/favicon.ico"
     };
 
+    /**
+     * API REST para Postman u otros clientes: el JWT llega en el encabezado
+     * {@code Authorization: Bearer} (no en cookie) y lo valida el resource server de Spring.
+     * CSRF se desactiva solo aquí, porque el navegador nunca agrega ese encabezado por su cuenta.
+     * Va primero ({@code @Order(1)}): las rutas /api/** no pasan por la cadena de las vistas.
+     */
     @Bean
+    @Order(1)
+    SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtService jwtService) throws Exception {
+        http
+                .securityMatcher("/api/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/businesses/**").permitAll()
+                        .requestMatchers("/api/client/**").hasRole("CLIENT")
+                        .requestMatchers("/api/business/**").hasRole("BUSINESS")
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtService::toAuthentication)))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
+        return http.build();
+    }
+
+    /** Vistas Thymeleaf: JWT y refresh token en cookies HttpOnly, con CSRF. */
+    @Bean
+    @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCookies cookies, JwtService jwtService,
                                             JwtDecoder jwtDecoder, RefreshTokenService refreshTokens,
                                             AuthProperties properties) throws Exception {

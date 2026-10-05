@@ -4,6 +4,7 @@ import com.sigecin.config.AuthProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -13,13 +14,10 @@ import java.time.Duration;
 
 /** Escribe, lee y borra las cookies HttpOnly del JWT de acceso y del refresh token. */
 @Component
+@RequiredArgsConstructor
 public class AuthCookies {
 
     private final AuthProperties properties;
-
-    public AuthCookies(AuthProperties properties) {
-        this.properties = properties;
-    }
 
     public void writeAccess(HttpServletResponse response, String token) {
         add(response, properties.accessCookieName(), token, properties.accessTokenTtl());

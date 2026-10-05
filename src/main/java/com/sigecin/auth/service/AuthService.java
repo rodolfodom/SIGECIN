@@ -4,6 +4,7 @@ import com.sigecin.auth.exception.EmailAlreadyRegisteredException;
 import com.sigecin.auth.web.form.RegisterForm;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 
 @Service
+@Slf4j
 public class AuthService {
 
     private final UserRepository users;
@@ -36,7 +38,9 @@ public class AuthService {
         User user = new User(form.getRole(), form.getFullName().trim(), email,
                 passwordEncoder.encode(form.getPassword()));
         try {
-            return users.saveAndFlush(user);
+            User saved = users.saveAndFlush(user);
+            log.info("Usuario {} registrado con rol {}", saved.getId(), saved.getRole());
+            return saved;
         } catch (DataIntegrityViolationException e) {
             // Otro registro con el mismo correo se adelantó (uq_user_email)
             throw new EmailAlreadyRegisteredException();
@@ -53,14 +57,18 @@ public class AuthService {
         User user = users.findByEmail(normalizeEmail(email)).orElse(null);
         if (user == null) {
             passwordEncoder.matches(password, dummyHash);
+            log.warn("Inicio de sesión fallido: correo no registrado");
             throw new BadCredentialsException("Credenciales inválidas");
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.warn("Inicio de sesión fallido: contraseña incorrecta para el usuario {}", user.getId());
             throw new BadCredentialsException("Credenciales inválidas");
         }
         if (!user.isActive()) {
+            log.warn("Inicio de sesión rechazado: la cuenta {} está inactiva", user.getId());
             throw new DisabledException("Cuenta inactiva");
         }
+        log.info("Inicio de sesión del usuario {} ({})", user.getId(), user.getRole());
         return user;
     }
 

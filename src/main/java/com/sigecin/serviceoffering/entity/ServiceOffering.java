@@ -11,6 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -24,6 +28,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "service")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ServiceOffering {
 
     @Id
@@ -35,19 +41,24 @@ public class ServiceOffering {
     private Business business;
 
     @Column(nullable = false, length = 120)
+    @Setter
     private String name;
 
+    @Setter
     private String description;
 
     @Column(name = "duration_min", nullable = false)
     @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Setter
     private Integer durationMin;
 
     // Precio vigente; las citas guardan su propia copia en price_at_booking
     @Column(nullable = false, precision = 10, scale = 2)
+    @Setter
     private BigDecimal price;
 
     @Column(name = "status_id", nullable = false)
+    @Setter
     private ServiceStatus status = ServiceStatus.ACTIVE;
 
     @Column(name = "created_at", insertable = false, updatable = false)
@@ -55,9 +66,6 @@ public class ServiceOffering {
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
-
-    protected ServiceOffering() {
-    }
 
     public ServiceOffering(Business business, String name, Integer durationMin, BigDecimal price) {
         this.business = business;
@@ -68,61 +76,5 @@ public class ServiceOffering {
 
     public boolean isActive() {
         return status == ServiceStatus.ACTIVE;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Business getBusiness() {
-        return business;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDurationMin() {
-        return durationMin;
-    }
-
-    public void setDurationMin(Integer durationMin) {
-        this.durationMin = durationMin;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public ServiceStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ServiceStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

@@ -4,6 +4,7 @@ import com.sigecin.auth.security.AuthenticatedUser;
 import com.sigecin.business.dto.FavoriteEntry;
 import com.sigecin.business.service.FavoriteService;
 import com.sigecin.common.web.LocalRedirects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,15 +23,12 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/favorites")
+@RequiredArgsConstructor
 public class FavoriteController {
 
     private static final String LIST = "/favorites";
 
     private final FavoriteService favorites;
-
-    public FavoriteController(FavoriteService favorites) {
-        this.favorites = favorites;
-    }
 
     @GetMapping
     public String list(@AuthenticationPrincipal AuthenticatedUser user, Model model) {

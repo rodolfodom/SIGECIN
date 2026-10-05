@@ -10,10 +10,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 /** Formulario de alta y edición de un servicio. */
+@Getter
+@Setter
 public class ServiceForm {
 
     @NotBlank
@@ -47,37 +51,5 @@ public class ServiceForm {
 
     public ServiceData toData() {
         return new ServiceData(name, description, durationMin, price);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDurationMin() {
-        return durationMin;
-    }
-
-    public void setDurationMin(Integer durationMin) {
-        this.durationMin = durationMin;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 }

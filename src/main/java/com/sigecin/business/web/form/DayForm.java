@@ -1,12 +1,16 @@
 package com.sigecin.business.web.form;
 
 import com.sigecin.business.dto.DaySchedule;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 /** Un renglón del horario semanal. Las horas solo son obligatorias si el día está abierto. */
+@Getter
+@Setter
 public class DayForm {
 
     private DayOfWeek day;
@@ -32,37 +36,5 @@ public class DayForm {
 
     public DaySchedule toData() {
         return new DaySchedule(day, open, openTime, closeTime);
-    }
-
-    public DayOfWeek getDay() {
-        return day;
-    }
-
-    public void setDay(DayOfWeek day) {
-        this.day = day;
-    }
-
-    public boolean isOpen() {
-        return open;
-    }
-
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    public LocalTime getOpenTime() {
-        return openTime;
-    }
-
-    public void setOpenTime(LocalTime openTime) {
-        this.openTime = openTime;
-    }
-
-    public LocalTime getCloseTime() {
-        return closeTime;
-    }
-
-    public void setCloseTime(LocalTime closeTime) {
-        this.closeTime = closeTime;
     }
 }

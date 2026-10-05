@@ -6,12 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /** Catálogo de categorías; el nombre está en español porque se muestra al usuario. */
 @Entity
 @Table(name = "business_category")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BusinessCategory {
 
     @Id
@@ -21,15 +26,4 @@ public class BusinessCategory {
 
     @Column(nullable = false, length = 80, unique = true)
     private String name;
-
-    protected BusinessCategory() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

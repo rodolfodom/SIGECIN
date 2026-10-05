@@ -5,6 +5,7 @@ import com.sigecin.report.dto.Dashboard;
 import com.sigecin.report.dto.ServiceRankingRow;
 import com.sigecin.report.dto.WeeklyDistribution;
 import com.sigecin.report.service.ReportDataService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import java.util.Map;
  * en la página al renderizarla (no hay endpoints JSON).
  */
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
 
     /** La gráfica de servicios muestra como máximo este número de barras. */
@@ -28,11 +30,6 @@ public class DashboardController {
 
     private final ReportDataService reportData;
     private final MessageSource messages;
-
-    public DashboardController(ReportDataService reportData, MessageSource messages) {
-        this.reportData = reportData;
-        this.messages = messages;
-    }
 
     @GetMapping("/business/dashboard")
     public String dashboard(@AuthenticationPrincipal AuthenticatedUser user, Model model) {

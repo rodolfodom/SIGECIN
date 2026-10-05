@@ -11,6 +11,8 @@ import com.sigecin.appointment.repository.AppointmentRepository;
 import com.sigecin.appointment.repository.CancellationReasonRepository;
 import com.sigecin.business.service.BusinessService;
 import com.sigecin.common.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import java.util.List;
  * la cita en el estado esperado y se rechaza.
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AppointmentService {
 
     public static final int PAGE_SIZE = 10;
@@ -35,14 +39,6 @@ public class AppointmentService {
     private final AppointmentDetailRepository details;
     private final CancellationReasonRepository reasons;
     private final BusinessService businessService;
-
-    public AppointmentService(AppointmentRepository appointments, AppointmentDetailRepository details,
-                              CancellationReasonRepository reasons, BusinessService businessService) {
-        this.appointments = appointments;
-        this.details = details;
-        this.reasons = reasons;
-        this.businessService = businessService;
-    }
 
     @Transactional(readOnly = true)
     public List<CancellationReason> reasonsFor(CancelledBy actor) {
@@ -96,6 +92,7 @@ public class AppointmentService {
         if (appointments.confirmIfPending(appointmentId, LocalDateTime.now()) == 0) {
             throw new AppointmentNotModifiableException("appointment.error.not-confirmable");
         }
+        log.info("Cita {} confirmada por el dueño {}", appointmentId, ownerId);
     }
 
     @Transactional
@@ -114,6 +111,7 @@ public class AppointmentService {
         if (appointments.cancelIfActive(appointmentId, reason, LocalDateTime.now()) == 0) {
             throw new AppointmentNotModifiableException("appointment.error.not-cancellable");
         }
+        log.info("Cita {} cancelada por {} (motivo: {})", appointmentId, actor, reason.getName());
     }
 
     private static NotFoundException notFound(Long appointmentId) {

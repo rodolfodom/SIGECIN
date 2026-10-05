@@ -4,6 +4,7 @@ import com.sigecin.auth.security.AuthenticatedUser;
 import com.sigecin.business.service.BusinessService;
 import com.sigecin.business.service.ScheduleService;
 import com.sigecin.business.web.form.ScheduleForm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,15 +18,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Horario semanal del negocio. */
 @Controller
 @RequestMapping("/business/schedule")
+@RequiredArgsConstructor
 public class BusinessScheduleController {
 
     private final BusinessService businessService;
     private final ScheduleService scheduleService;
-
-    public BusinessScheduleController(BusinessService businessService, ScheduleService scheduleService) {
-        this.businessService = businessService;
-        this.scheduleService = scheduleService;
-    }
 
     @GetMapping
     public String form(@AuthenticationPrincipal AuthenticatedUser user, Model model) {

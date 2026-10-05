@@ -4,6 +4,7 @@ import com.sigecin.auth.security.AuthenticatedUser;
 import com.sigecin.config.AuthProperties;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -19,6 +20,7 @@ import java.util.List;
 
 /** Emite los JWT y los convierte de vuelta en la autenticación de la petición. */
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
     static final String ISSUER = "sigecin";
@@ -28,11 +30,6 @@ public class JwtService {
 
     private final JwtEncoder encoder;
     private final AuthProperties properties;
-
-    public JwtService(JwtEncoder encoder, AuthProperties properties) {
-        this.encoder = encoder;
-        this.properties = properties;
-    }
 
     public String issueToken(User user) {
         Instant now = Instant.now();

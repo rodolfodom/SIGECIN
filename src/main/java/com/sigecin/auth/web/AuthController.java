@@ -12,6 +12,7 @@ import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.stereotype.Controller;
@@ -25,20 +26,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Registro, inicio de sesión y la redirección inicial según el rol. */
 @Controller
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokens;
     private final AuthCookies cookies;
-
-    public AuthController(AuthService authService, JwtService jwtService,
-                          RefreshTokenService refreshTokens, AuthCookies cookies) {
-        this.authService = authService;
-        this.jwtService = jwtService;
-        this.refreshTokens = refreshTokens;
-        this.cookies = cookies;
-    }
 
     @GetMapping("/")
     public String home() {

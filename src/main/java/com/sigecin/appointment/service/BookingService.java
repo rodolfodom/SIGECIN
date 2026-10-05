@@ -12,6 +12,8 @@ import com.sigecin.serviceoffering.repository.ServiceOfferingRepository;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
 import com.sigecin.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import java.time.temporal.ChronoUnit;
  * bloqueando la fila del negocio (SELECT ... FOR UPDATE) antes de verificar traslapes.
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class BookingService {
 
     private final ServiceOfferingRepository services;
@@ -32,16 +36,6 @@ public class BookingService {
     private final BusinessScheduleRepository schedules;
     private final AppointmentRepository appointments;
     private final UserRepository users;
-
-    public BookingService(ServiceOfferingRepository services, BusinessRepository businesses,
-                          BusinessScheduleRepository schedules, AppointmentRepository appointments,
-                          UserRepository users) {
-        this.services = services;
-        this.businesses = businesses;
-        this.schedules = schedules;
-        this.appointments = appointments;
-        this.users = users;
-    }
 
     /**
      * Crea la cita en PENDING con el precio vigente del servicio, o lanza
@@ -71,13 +65,17 @@ public class BookingService {
             throw new BookingRejectedException(BookingRejectedException.OUTSIDE_HOURS);
         }
         if (appointments.existsOverlapping(business.getId(), start, end)) {
+            log.info("Reserva rechazada: el horario {} del negocio {} ya está ocupado", start, business.getId());
             throw new BookingRejectedException(BookingRejectedException.TAKEN);
         }
 
         User client = users.findById(clientId)
                 .filter(user -> user.getRole() == Role.CLIENT)
                 .orElseThrow(() -> new IllegalStateException("Solo un usuario CLIENT puede reservar"));
-        return appointments.save(new Appointment(client, service, start, clientNotes));
+        Appointment appointment = appointments.save(new Appointment(client, service, start, clientNotes));
+        log.info("Cita {} reservada: cliente {}, servicio {}, inicio {}",
+                appointment.getId(), clientId, serviceId, start);
+        return appointment;
     }
 
     /** La cita completa cabe en el horario activo de ese día (sin pasar de la medianoche). */

@@ -17,6 +17,8 @@ import com.sigecin.serviceoffering.repository.ServiceOfferingRepository;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
 import com.sigecin.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ import java.util.List;
 
 /** Alta, modificación, baja y reactivación del negocio de un dueño (rol BUSINESS). */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class BusinessService {
 
     private final BusinessRepository businesses;
@@ -35,19 +39,6 @@ public class BusinessService {
     private final AppointmentRepository appointments;
     private final CancellationReasonRepository reasons;
     private final UserRepository users;
-
-    public BusinessService(BusinessRepository businesses, BusinessCategoryRepository categories,
-                           BusinessScheduleRepository schedules, ServiceOfferingRepository services,
-                           AppointmentRepository appointments, CancellationReasonRepository reasons,
-                           UserRepository users) {
-        this.businesses = businesses;
-        this.categories = categories;
-        this.schedules = schedules;
-        this.services = services;
-        this.appointments = appointments;
-        this.reasons = reasons;
-        this.users = users;
-    }
 
     @Transactional(readOnly = true)
     public boolean hasBusiness(Long ownerId) {
@@ -77,7 +68,9 @@ public class BusinessService {
         Business business = new Business(owner, category(data.categoryId()), data.name());
         apply(business, data);
         try {
-            return businesses.saveAndFlush(business);
+            Business saved = businesses.saveAndFlush(business);
+            log.info("Negocio {} registrado por el usuario {}", saved.getId(), ownerId);
+            return saved;
         } catch (DataIntegrityViolationException e) {
             // Doble envío del formulario: uq_business_user ya tiene el negocio
             throw new BusinessAlreadyExistsException();
@@ -120,13 +113,17 @@ public class BusinessService {
         business.setActive(false);
         CancellationReason reason = reasons.findByName(CancellationReason.BUSINESS_DEACTIVATED)
                 .orElseThrow(() -> new IllegalStateException("Falta el motivo de cancelación por baja del negocio"));
-        return appointments.cancelFutureActiveByBusiness(business.getId(), LocalDateTime.now(), reason);
+        int cancelled = appointments.cancelFutureActiveByBusiness(business.getId(), LocalDateTime.now(), reason);
+        log.info("Negocio {} dado de baja; citas futuras canceladas: {}", business.getId(), cancelled);
+        return cancelled;
     }
 
     /** Reactiva el negocio; las citas canceladas en la baja no se restauran. */
     @Transactional
     public void activate(Long ownerId) {
-        getByOwner(ownerId).setActive(true);
+        Business business = getByOwner(ownerId);
+        business.setActive(true);
+        log.info("Negocio {} reactivado", business.getId());
     }
 
     private BusinessCategory category(Integer categoryId) {

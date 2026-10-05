@@ -14,6 +14,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +25,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "business")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Business {
 
     @Id
@@ -34,21 +40,27 @@ public class Business {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
+    @Setter
     private BusinessCategory category;
 
     @Column(nullable = false, length = 150)
+    @Setter
     private String name;
 
     @Column(columnDefinition = "text")
+    @Setter
     private String description;
 
     @Column(length = 20)
+    @Setter
     private String phone;
 
+    @Setter
     private String address;
 
     // Baja lógica: un negocio inactivo no acepta reservas y conserva su historial
     @Column(nullable = false)
+    @Setter
     private boolean active = true;
 
     @Column(name = "created_at", insertable = false, updatable = false)
@@ -61,80 +73,9 @@ public class Business {
     @OrderBy("dayOfWeek")
     private List<BusinessSchedule> schedules = new ArrayList<>();
 
-    protected Business() {
-    }
-
     public Business(User owner, BusinessCategory category, String name) {
         this.owner = owner;
         this.category = category;
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public BusinessCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(BusinessCategory category) {
-        this.category = category;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<BusinessSchedule> getSchedules() {
-        return schedules;
     }
 }

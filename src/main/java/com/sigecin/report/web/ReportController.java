@@ -5,6 +5,8 @@ import com.sigecin.report.pdf.MonthlyReportPdf;
 import com.sigecin.report.service.ReportDataService;
 import com.sigecin.report.web.form.ReportPeriodForm;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +28,8 @@ import java.util.stream.IntStream;
 /** Reporte mensual: selector de año y mes, y descarga del PDF. */
 @Controller
 @RequestMapping("/business/reports")
+@RequiredArgsConstructor
+@Slf4j
 public class ReportController {
 
     /** El selector ofrece el año en curso, los tres anteriores y el siguiente. */
@@ -33,11 +37,6 @@ public class ReportController {
 
     private final ReportDataService reportData;
     private final MonthlyReportPdf pdf;
-
-    public ReportController(ReportDataService reportData, MonthlyReportPdf pdf) {
-        this.reportData = reportData;
-        this.pdf = pdf;
-    }
 
     @GetMapping
     public String selector(Model model) {
@@ -59,6 +58,7 @@ public class ReportController {
         }
         YearMonth period = reportPeriodForm.toYearMonth();
         byte[] content = pdf.render(reportData.monthlyReport(user.id(), period));
+        log.info("Reporte PDF {} generado para el dueño {} ({} bytes)", period, user.id(), content.length);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()

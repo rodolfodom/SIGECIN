@@ -7,6 +7,8 @@ import com.sigecin.serviceoffering.dto.ServiceData;
 import com.sigecin.serviceoffering.entity.ServiceOffering;
 import com.sigecin.serviceoffering.enums.ServiceStatus;
 import com.sigecin.serviceoffering.repository.ServiceOfferingRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +20,12 @@ import java.util.List;
  * servicio solo impide nuevas reservas.
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ServiceOfferingService {
 
     private final ServiceOfferingRepository services;
     private final BusinessService businessService;
-
-    public ServiceOfferingService(ServiceOfferingRepository services, BusinessService businessService) {
-        this.services = services;
-        this.businessService = businessService;
-    }
 
     @Transactional(readOnly = true)
     public List<ServiceOffering> listOwned(Long ownerId) {
@@ -46,7 +45,9 @@ public class ServiceOfferingService {
         Business business = businessService.getByOwner(ownerId);
         ServiceOffering service = new ServiceOffering(business, data.name(), data.durationMin(), data.price());
         service.setDescription(data.description());
-        return services.save(service);
+        ServiceOffering saved = services.save(service);
+        log.info("Servicio {} creado en el negocio {}", saved.getId(), business.getId());
+        return saved;
     }
 
     @Transactional
@@ -65,6 +66,7 @@ public class ServiceOfferingService {
         ServiceOffering service = getOwned(ownerId, serviceId);
         service.setStatus(service.isActive() ? ServiceStatus.INACTIVE : ServiceStatus.ACTIVE);
         services.save(service);
+        log.info("Servicio {} cambiado a {}", serviceId, service.getStatus());
         return service.getStatus();
     }
 }

@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -19,6 +20,7 @@ import java.io.IOException;
  * la petición para que la autentique el filtro del JWT. Si el refresh token no sirve,
  * borra ambas cookies y marca la sesión como expirada (la petición sigue como anónima).
  */
+@Slf4j
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
     /** JWT recién emitido que debe usarse en lugar del de la cookie. */
@@ -58,7 +60,9 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
                     cookies.writeRefresh(response, renewal.newRefreshToken());
                 }
                 request.setAttribute(RENEWED_ACCESS_TOKEN, accessToken);
+                log.debug("JWT de acceso renovado con el refresh token (usuario {})", renewal.user().getId());
             }, () -> {
+                log.debug("No se pudo renovar la sesión: se borran las cookies");
                 cookies.clearAll(response);
                 request.setAttribute(SESSION_EXPIRED, Boolean.TRUE);
             });

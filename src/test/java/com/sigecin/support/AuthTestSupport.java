@@ -34,6 +34,11 @@ public class AuthTestSupport {
         return new Cookie(ACCESS_COOKIE, jwtService.issueToken(user));
     }
 
+    /** Valor del encabezado Authorization para la API REST. */
+    public String bearerFor(String email) {
+        return "Bearer " + jwtService.issueToken(users.findByEmail(email).orElseThrow());
+    }
+
     /** Usuario BUSINESS recién registrado, todavía sin negocio. */
     public User newBusinessOwner(String email) {
         return users.save(new User(Role.BUSINESS, "Dueño Nuevo", email, "$2a$10$sinUsoEnEstasPruebas"));

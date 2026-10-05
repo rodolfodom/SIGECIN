@@ -10,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,6 +24,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "refresh_token")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
     @Id
@@ -54,9 +59,6 @@ public class RefreshToken {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected RefreshToken() {
-    }
-
     public RefreshToken(User user, String familyId, String tokenHash, LocalDateTime expiresAt) {
         this.user = user;
         this.familyId = familyId;
@@ -80,33 +82,5 @@ public class RefreshToken {
     public void rotateTo(RefreshToken successor, LocalDateTime now) {
         this.replacedBy = successor;
         this.revokedAt = now;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getFamilyId() {
-        return familyId;
-    }
-
-    public String getTokenHash() {
-        return tokenHash;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public LocalDateTime getRevokedAt() {
-        return revokedAt;
-    }
-
-    public RefreshToken getReplacedBy() {
-        return replacedBy;
     }
 }

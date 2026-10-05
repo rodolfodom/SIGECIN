@@ -4,8 +4,8 @@ import com.sigecin.auth.entity.RefreshToken;
 import com.sigecin.auth.repository.RefreshTokenRepository;
 import com.sigecin.config.AuthProperties;
 import com.sigecin.user.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,18 +31,14 @@ import java.util.UUID;
  * </ul>
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class RefreshTokenService {
 
-    private static final Logger log = LoggerFactory.getLogger(RefreshTokenService.class);
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final RefreshTokenRepository tokens;
     private final AuthProperties properties;
-
-    public RefreshTokenService(RefreshTokenRepository tokens, AuthProperties properties) {
-        this.tokens = tokens;
-        this.properties = properties;
-    }
 
     /**
      * Resultado de una renovación válida. {@code newRefreshToken} es null cuando el token
@@ -54,7 +50,9 @@ public class RefreshTokenService {
     /** Inicia una familia nueva al iniciar sesión; devuelve el token en claro para la cookie. */
     @Transactional
     public String create(User user) {
-        return issue(user, UUID.randomUUID().toString(), LocalDateTime.now()).raw();
+        String familyId = UUID.randomUUID().toString();
+        log.debug("Nueva familia de refresh tokens {} para el usuario {}", familyId, user.getId());
+        return issue(user, familyId, LocalDateTime.now()).raw();
     }
 
     /**
@@ -67,6 +65,7 @@ public class RefreshTokenService {
         LocalDateTime now = LocalDateTime.now();
         RefreshToken current = tokens.findByHashForUpdate(hash(rawToken)).orElse(null);
         if (current == null || current.isExpired(now)) {
+            log.debug("Refresh token inexistente o vencido");
             return Optional.empty();
         }
         if (current.isRevoked()) {
@@ -78,11 +77,13 @@ public class RefreshTokenService {
             return Optional.empty();
         }
         if (!current.getUser().isActive()) {
+            log.info("Refresh token de la cuenta inactiva {}; se revoca la familia", current.getUser().getId());
             tokens.revokeFamily(current.getFamilyId(), now);
             return Optional.empty();
         }
         Issued next = issue(current.getUser(), current.getFamilyId(), now);
         current.rotateTo(next.token(), now);
+        log.debug("Refresh token rotado (usuario {}, familia {})", current.getUser().getId(), current.getFamilyId());
         return Optional.of(new Renewal(current.getUser(), next.raw()));
     }
 
@@ -93,7 +94,10 @@ public class RefreshTokenService {
             return;
         }
         tokens.findByTokenHash(hash(rawToken))
-                .ifPresent(token -> tokens.revokeFamily(token.getFamilyId(), LocalDateTime.now()));
+                .ifPresent(token -> {
+                    tokens.revokeFamily(token.getFamilyId(), LocalDateTime.now());
+                    log.info("Sesión cerrada: familia {} revocada", token.getFamilyId());
+                });
     }
 
     /** Limpieza diaria de tokens vencidos (ya no sirven ni para detectar reutilización). */

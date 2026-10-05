@@ -3,8 +3,8 @@ package com.sigecin.appointment.service;
 import com.sigecin.appointment.entity.CancellationReason;
 import com.sigecin.appointment.repository.AppointmentRepository;
 import com.sigecin.appointment.repository.CancellationReasonRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +18,12 @@ import java.time.LocalDateTime;
  * instancia de la aplicación (monolito).
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ExpiredAppointmentCanceller {
-
-    private static final Logger log = LoggerFactory.getLogger(ExpiredAppointmentCanceller.class);
 
     private final AppointmentRepository appointments;
     private final CancellationReasonRepository reasons;
-
-    public ExpiredAppointmentCanceller(AppointmentRepository appointments, CancellationReasonRepository reasons) {
-        this.appointments = appointments;
-        this.reasons = reasons;
-    }
 
     @Scheduled(initialDelay = 0, fixedDelayString = "PT5M")
     @Transactional

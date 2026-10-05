@@ -3,6 +3,7 @@ package com.sigecin.config;
 import com.sigecin.business.service.BusinessService;
 import com.sigecin.business.web.BusinessSetupInterceptor;
 import com.sigecin.common.web.CookieFlashMapManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -11,13 +12,10 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
     private final BusinessService businessService;
-
-    public WebConfig(BusinessService businessService) {
-        this.businessService = businessService;
-    }
 
     // Un dueño sin negocio registrado es llevado a /business/setup
     @Override

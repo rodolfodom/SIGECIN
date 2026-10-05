@@ -5,6 +5,7 @@ import com.sigecin.serviceoffering.enums.ServiceStatus;
 import com.sigecin.serviceoffering.service.ServiceOfferingService;
 import com.sigecin.serviceoffering.web.form.ServiceForm;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,15 +23,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Servicios del negocio: lista, alta, edición y activar/desactivar (no se borran). */
 @Controller
 @RequestMapping("/business/services")
+@RequiredArgsConstructor
 public class ServiceOfferingController {
 
     private static final String FORM_VIEW = "business/service-form";
 
     private final ServiceOfferingService serviceOfferingService;
-
-    public ServiceOfferingController(ServiceOfferingService serviceOfferingService) {
-        this.serviceOfferingService = serviceOfferingService;
-    }
 
     @InitBinder("serviceForm")
     void trimStrings(WebDataBinder binder) {

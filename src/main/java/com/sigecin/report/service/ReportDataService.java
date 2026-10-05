@@ -10,6 +10,7 @@ import com.sigecin.report.dto.MonthlySummary;
 import com.sigecin.report.dto.ServiceRankingRow;
 import com.sigecin.report.dto.WeeklyDistribution;
 import com.sigecin.report.repository.ReportRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import java.util.Map;
  * ambas usan la zona America/Mexico_City.
  */
 @Service
+@RequiredArgsConstructor
 public class ReportDataService {
 
     public static final int UPCOMING_LIMIT = 5;
@@ -32,13 +34,6 @@ public class ReportDataService {
     private final BusinessService businessService;
     private final ReportRepository reports;
     private final AppointmentDetailRepository appointments;
-
-    public ReportDataService(BusinessService businessService, ReportRepository reports,
-                             AppointmentDetailRepository appointments) {
-        this.businessService = businessService;
-        this.reports = reports;
-        this.appointments = appointments;
-    }
 
     @Transactional(readOnly = true)
     public Dashboard dashboard(Long ownerId) {

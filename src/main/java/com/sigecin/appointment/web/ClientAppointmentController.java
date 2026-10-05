@@ -10,6 +10,7 @@ import com.sigecin.appointment.service.BookingService;
 import com.sigecin.appointment.web.form.BookingForm;
 import com.sigecin.auth.security.AuthenticatedUser;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,15 +34,11 @@ import java.time.LocalDateTime;
 /** Citas del cliente: reservar, listar, consultar y cancelar. */
 @Controller
 @RequestMapping("/appointments")
+@RequiredArgsConstructor
 public class ClientAppointmentController {
 
     private final BookingService bookingService;
     private final AppointmentService appointmentService;
-
-    public ClientAppointmentController(BookingService bookingService, AppointmentService appointmentService) {
-        this.bookingService = bookingService;
-        this.appointmentService = appointmentService;
-    }
 
     @InitBinder("bookingForm")
     void trimStrings(WebDataBinder binder) {

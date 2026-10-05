@@ -11,6 +11,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -18,6 +22,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -28,16 +34,20 @@ public class User {
     private Role role;
 
     @Column(name = "full_name", nullable = false, length = 120)
+    @Setter
     private String fullName;
 
     @Column(nullable = false, length = 150, unique = true)
+    @Setter
     private String email;
 
     // Hash bcrypt, nunca texto plano
     @Column(nullable = false)
+    @Setter
     private String password;
 
     @Column(nullable = false)
+    @Setter
     private boolean active = true;
 
     // Las fechas de auditoría las llena MariaDB (DEFAULT / ON UPDATE CURRENT_TIMESTAMP)
@@ -55,65 +65,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "business_id"))
     private Set<Business> favoriteBusinesses = new HashSet<>();
 
-    protected User() {
-    }
-
     public User(Role role, String fullName, String email, String password) {
         this.role = role;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Set<Business> getFavoriteBusinesses() {
-        return favoriteBusinesses;
     }
 }

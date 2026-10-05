@@ -9,6 +9,7 @@ import com.sigecin.business.repository.BusinessRepository;
 import com.sigecin.common.exception.NotFoundException;
 import com.sigecin.serviceoffering.enums.ServiceStatus;
 import com.sigecin.serviceoffering.repository.ServiceOfferingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.List;
  * servicio activo y un día de horario activo); los demás no existen para el cliente (404).
  */
 @Service
+@RequiredArgsConstructor
 public class BusinessDirectoryService {
 
     public static final int DEFAULT_PAGE_SIZE = 12;
@@ -29,13 +31,6 @@ public class BusinessDirectoryService {
     private final BusinessRepository businesses;
     private final BusinessCategoryRepository categories;
     private final ServiceOfferingRepository services;
-
-    public BusinessDirectoryService(BusinessRepository businesses, BusinessCategoryRepository categories,
-                                    ServiceOfferingRepository services) {
-        this.businesses = businesses;
-        this.categories = categories;
-        this.services = services;
-    }
 
     /** Búsqueda por nombre (parcial, sin distinguir mayúsculas) y/o categoría. */
     @Transactional(readOnly = true)

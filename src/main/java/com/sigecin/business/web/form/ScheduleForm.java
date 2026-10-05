@@ -2,6 +2,8 @@ package com.sigecin.business.web.form;
 
 import com.sigecin.business.dto.DaySchedule;
 import com.sigecin.business.entity.Business;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.validation.Errors;
 
 import java.time.LocalTime;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Horario de la semana completa: siempre siete renglones, de lunes a domingo. */
+@Getter
+@Setter
 public class ScheduleForm {
 
     // Horas sugeridas para un día que nunca se ha configurado
@@ -49,13 +53,5 @@ public class ScheduleForm {
 
     public List<DaySchedule> toData() {
         return days.stream().map(DayForm::toData).toList();
-    }
-
-    public List<DayForm> getDays() {
-        return days;
-    }
-
-    public void setDays(List<DayForm> days) {
-        this.days = days;
     }
 }

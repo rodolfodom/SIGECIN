@@ -7,6 +7,7 @@ import com.sigecin.common.exception.NotFoundException;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
 import com.sigecin.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +20,11 @@ import java.util.Set;
  * cuyo negocio deja de serlo se conserva y se muestra como "no disponible".
  */
 @Service
+@RequiredArgsConstructor
 public class FavoriteService {
 
     private final UserRepository users;
     private final BusinessRepository businesses;
-
-    public FavoriteService(UserRepository users, BusinessRepository businesses) {
-        this.users = users;
-        this.businesses = businesses;
-    }
 
     @Transactional(readOnly = true)
     public boolean isFavorite(Long clientId, Long businessId) {

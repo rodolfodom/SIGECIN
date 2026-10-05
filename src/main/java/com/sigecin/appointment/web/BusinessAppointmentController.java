@@ -6,6 +6,7 @@ import com.sigecin.appointment.exception.AppointmentNotModifiableException;
 import com.sigecin.appointment.service.AppointmentService;
 import com.sigecin.appointment.web.view.CalendarView;
 import com.sigecin.auth.security.AuthenticatedUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,13 +24,10 @@ import java.time.LocalDateTime;
 /** Citas del negocio: calendario, detalle, confirmar y cancelar. */
 @Controller
 @RequestMapping("/business/appointments")
+@RequiredArgsConstructor
 public class BusinessAppointmentController {
 
     private final AppointmentService appointmentService;
-
-    public BusinessAppointmentController(AppointmentService appointmentService) {
-        this.appointmentService = appointmentService;
-    }
 
     /** Calendario de semana ({@code view=week}, por defecto) o de mes ({@code view=month}). */
     @GetMapping

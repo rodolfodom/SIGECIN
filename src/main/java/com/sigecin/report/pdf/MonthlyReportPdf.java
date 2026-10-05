@@ -23,6 +23,7 @@ import com.sigecin.report.dto.MonthlyReport;
 import com.sigecin.report.dto.MonthlySummary;
 import com.sigecin.report.dto.ServiceRankingRow;
 import com.sigecin.report.dto.WeeklyDistribution;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,7 @@ import java.util.Locale;
  * Usa las fuentes estándar del PDF (Helvetica), que cubren los acentos del español.
  */
 @Component
+@RequiredArgsConstructor
 public class MonthlyReportPdf {
 
     private static final Locale LOCALE = Locale.forLanguageTag("es-MX");
@@ -54,10 +56,6 @@ public class MonthlyReportPdf {
     private static final DateTimeFormatter GENERATED = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy, HH:mm", LOCALE);
 
     private final MessageSource messages;
-
-    public MonthlyReportPdf(MessageSource messages) {
-        this.messages = messages;
-    }
 
     public byte[] render(MonthlyReport report) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

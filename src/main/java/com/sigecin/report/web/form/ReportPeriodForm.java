@@ -3,10 +3,14 @@ package com.sigecin.report.web.form;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.YearMonth;
 
 /** Año y mes del reporte mensual (parámetros de GET /business/reports/monthly). */
+@Getter
+@Setter
 public class ReportPeriodForm {
 
     @NotNull
@@ -28,21 +32,5 @@ public class ReportPeriodForm {
 
     public YearMonth toYearMonth() {
         return YearMonth.of(year, month);
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public Integer getMonth() {
-        return month;
-    }
-
-    public void setMonth(Integer month) {
-        this.month = month;
     }
 }

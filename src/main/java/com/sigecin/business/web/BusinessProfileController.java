@@ -7,6 +7,7 @@ import com.sigecin.business.exception.BusinessAlreadyExistsException;
 import com.sigecin.business.service.BusinessService;
 import com.sigecin.business.web.form.BusinessForm;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,15 +24,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Alta, consulta, modificación, baja y reactivación del negocio del dueño. */
 @Controller
 @RequestMapping("/business")
+@RequiredArgsConstructor
 public class BusinessProfileController {
 
     private static final String FORM_VIEW = "business/profile-form";
 
     private final BusinessService businessService;
-
-    public BusinessProfileController(BusinessService businessService) {
-        this.businessService = businessService;
-    }
 
     // Recorta espacios y convierte los campos vacíos en null (teléfono y dirección son opcionales)
     @InitBinder("businessForm")

@@ -7,12 +7,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /** Motivo de cancelación (en español, se muestra al usuario), asociado al actor que cancela. */
 @Entity
 @Table(name = "appointment_cancellation_reason")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CancellationReason {
 
     /** Motivo que se asigna a las citas futuras cuando el dueño da de baja su negocio. */
@@ -31,19 +36,4 @@ public class CancellationReason {
 
     @Column(name = "cancelled_by_id", nullable = false)
     private CancelledBy cancelledBy;
-
-    protected CancellationReason() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public CancelledBy getCancelledBy() {
-        return cancelledBy;
-    }
 }

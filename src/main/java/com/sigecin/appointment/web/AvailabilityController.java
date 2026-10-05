@@ -2,6 +2,7 @@ package com.sigecin.appointment.web;
 
 import com.sigecin.appointment.service.AvailabilityService;
 import com.sigecin.appointment.web.form.BookingForm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,13 +17,10 @@ import java.time.LocalDate;
  * la sesión de cliente se pide al confirmar (el formulario envía POST /appointments).
  */
 @Controller
+@RequiredArgsConstructor
 public class AvailabilityController {
 
     private final AvailabilityService availabilityService;
-
-    public AvailabilityController(AvailabilityService availabilityService) {
-        this.availabilityService = availabilityService;
-    }
 
     @GetMapping("/businesses/{businessId}/availability")
     public String availability(@PathVariable Long businessId, @RequestParam Long serviceId,

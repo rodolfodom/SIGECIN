@@ -12,6 +12,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,6 +23,8 @@ import java.time.LocalDateTime;
 /** Cita de un cliente; el negocio se obtiene a través del servicio. */
 @Entity
 @Table(name = "appointment")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Appointment {
 
     @Id
@@ -46,6 +52,7 @@ public class Appointment {
     private BigDecimal priceAtBooking;
 
     @Column(name = "status_id", nullable = false)
+    @Setter
     private AppointmentStatus status = AppointmentStatus.PENDING;
 
     @Column(name = "client_notes", length = 500)
@@ -54,6 +61,7 @@ public class Appointment {
     // Vacío mientras la cita no esté cancelada
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancelled_reason_id")
+    @Setter
     private CancellationReason cancelledReason;
 
     @Column(name = "created_at", insertable = false, updatable = false)
@@ -61,9 +69,6 @@ public class Appointment {
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
-
-    protected Appointment() {
-    }
 
     /** Crea la cita en PENDING, calcula el fin y copia el precio vigente del servicio. */
     public Appointment(User client, ServiceOffering service, LocalDateTime startTime, String clientNotes) {
@@ -83,57 +88,5 @@ public class Appointment {
     /** El negocio aún puede confirmarla: está pendiente y no ha empezado. */
     public boolean isConfirmable(LocalDateTime now) {
         return status == AppointmentStatus.PENDING && startTime.isAfter(now);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getClient() {
-        return client;
-    }
-
-    public ServiceOffering getService() {
-        return service;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public BigDecimal getPriceAtBooking() {
-        return priceAtBooking;
-    }
-
-    public AppointmentStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AppointmentStatus status) {
-        this.status = status;
-    }
-
-    public String getClientNotes() {
-        return clientNotes;
-    }
-
-    public CancellationReason getCancelledReason() {
-        return cancelledReason;
-    }
-
-    public void setCancelledReason(CancellationReason cancelledReason) {
-        this.cancelledReason = cancelledReason;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

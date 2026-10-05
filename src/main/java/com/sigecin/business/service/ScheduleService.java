@@ -4,6 +4,8 @@ import com.sigecin.business.dto.DaySchedule;
 import com.sigecin.business.entity.Business;
 import com.sigecin.business.entity.BusinessSchedule;
 import com.sigecin.business.repository.BusinessRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,15 +13,12 @@ import java.util.List;
 
 /** Horario semanal del negocio: un registro por día, que se desactiva en lugar de borrarse. */
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ScheduleService {
 
     private final BusinessService businessService;
     private final BusinessRepository businesses;
-
-    public ScheduleService(BusinessService businessService, BusinessRepository businesses) {
-        this.businessService = businessService;
-        this.businesses = businesses;
-    }
 
     /**
      * Guarda los días recibidos. Un día abierto crea o actualiza su horario; un día cerrado
@@ -50,5 +49,6 @@ public class ScheduleService {
             }
         }
         businesses.save(business);
+        log.info("Horario semanal actualizado del negocio {}", business.getId());
     }
 }

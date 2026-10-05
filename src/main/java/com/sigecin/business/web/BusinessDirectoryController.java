@@ -4,6 +4,7 @@ import com.sigecin.auth.security.AuthenticatedUser;
 import com.sigecin.business.service.BusinessDirectoryService;
 import com.sigecin.business.service.FavoriteService;
 import com.sigecin.user.enums.Role;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,15 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Búsqueda y detalle públicos de negocios (rutas sin sesión obligatoria). */
 @Controller
 @RequestMapping("/businesses")
+@RequiredArgsConstructor
 public class BusinessDirectoryController {
 
     private final BusinessDirectoryService directory;
     private final FavoriteService favorites;
-
-    public BusinessDirectoryController(BusinessDirectoryService directory, FavoriteService favorites) {
-        this.directory = directory;
-        this.favorites = favorites;
-    }
 
     @GetMapping
     public String search(@RequestParam(required = false) String name,
