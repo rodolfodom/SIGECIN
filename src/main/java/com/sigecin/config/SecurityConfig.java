@@ -20,7 +20,9 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -48,7 +50,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCookies cookies, JwtService jwtService,
                                             JwtDecoder jwtDecoder, RefreshTokenService refreshTokens,
-                                            AuthProperties properties) throws Exception {
+                                            CsrfTokenRepository csrfTokenRepository) throws Exception {
         var entryPoint = new LoginRedirectEntryPoint(cookies);
         // sendError(403) para que se muestre templates/error/403.html
         var accessDenied = new AccessDeniedHandlerImpl();
@@ -74,7 +76,13 @@ public class SecurityConfig {
                         .authenticationEntryPoint(entryPoint)
                         .accessDeniedHandler(accessDenied))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository(properties)))
+                // Sin estado, SessionManagementFilter trata cada petición con JWT como un inicio de sesión
+                // nuevo; con la estrategia por defecto el token CSRF rotaría en cada página y los formularios
+                // de otras pestañas o del historial darían 403 (p. ej. al cerrar sesión). El token se rota a
+                // mano al iniciar sesión (AuthController) y se borra al cerrarla (CsrfLogoutHandler).
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(csrfTokenRepository)
+                        .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy()))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler((request, response, auth) -> {
@@ -97,7 +105,8 @@ public class SecurityConfig {
         return new OrRequestMatcher(Arrays.stream(TOKEN_IGNORED).map(builder::matcher).toArray(RequestMatcher[]::new));
     }
 
-    private static CookieCsrfTokenRepository csrfTokenRepository(AuthProperties properties) {
+    @Bean
+    CsrfTokenRepository csrfTokenRepository(AuthProperties properties) {
         var repository = new CookieCsrfTokenRepository();
         repository.setCookieCustomizer(cookie -> cookie.secure(properties.cookieSecure()).sameSite("Lax"));
         return repository;

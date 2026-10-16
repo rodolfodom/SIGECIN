@@ -23,3 +23,7 @@ bin/
 .env
 application-local.properties
 *.log
+
+# Claude Code (worktrees y configuración local)
+.claude/worktrees/
+.claude/settings.local.json

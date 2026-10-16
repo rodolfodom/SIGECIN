@@ -10,10 +10,12 @@ import com.sigecin.auth.web.form.RegisterForm;
 import com.sigecin.common.web.LocalRedirects;
 import com.sigecin.user.entity.User;
 import com.sigecin.user.enums.Role;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,13 +33,16 @@ public class AuthController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokens;
     private final AuthCookies cookies;
+    private final CsrfTokenRepository csrfTokens;
 
     public AuthController(AuthService authService, JwtService jwtService,
-                          RefreshTokenService refreshTokens, AuthCookies cookies) {
+                          RefreshTokenService refreshTokens, AuthCookies cookies,
+                          CsrfTokenRepository csrfTokens) {
         this.authService = authService;
         this.jwtService = jwtService;
         this.refreshTokens = refreshTokens;
         this.cookies = cookies;
+        this.csrfTokens = csrfTokens;
     }
 
     @GetMapping("/")
@@ -80,7 +85,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute LoginForm loginForm, BindingResult result,
-                        HttpServletResponse response, Model model) {
+                        HttpServletRequest request, HttpServletResponse response, Model model) {
         if (result.hasErrors()) {
             return "auth/login";
         }
@@ -96,6 +101,8 @@ public class AuthController {
         }
         cookies.writeAccess(response, jwtService.issueToken(user));
         cookies.writeRefresh(response, refreshTokens.create(user));
+        // Token CSRF nuevo al cambiar de identidad (la siguiente página genera otro)
+        csrfTokens.saveToken(null, request, response);
         return "redirect:" + targetAfterLogin(loginForm.getRedirect(), user.getRole());
     }
 
